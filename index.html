@@ -48,14 +48,9 @@
       padding: 0 0 90px 0;
       position: relative;
     }
-    @media (min-width: 768px) {
-      .app { max-width: 700px; }
-    }
-    @media (min-width: 1200px) {
-      .app { max-width: 900px; }
-    }
+    @media (min-width: 768px) { .app { max-width: 700px; } }
+    @media (min-width: 1200px) { .app { max-width: 900px; } }
 
-    /* Header */
     .header {
       display: flex;
       align-items: center;
@@ -86,7 +81,6 @@
       backdrop-filter: blur(10px);
     }
 
-    /* Cards */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -100,14 +94,8 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .card h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--primary);
-    }
+    .card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 12px; color: var(--primary); }
 
-    /* Buttons */
     .btn {
       display: block;
       width: 100%;
@@ -124,21 +112,10 @@
       box-shadow: 0 4px 12px rgba(255,107,0,0.25);
     }
     .btn:active { transform: scale(0.97); }
-    .btn.secondary {
-      background: var(--surface);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      box-shadow: none;
-    }
+    .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); box-shadow: none; }
     .btn.green { background: var(--green); color: #000; box-shadow: 0 4px 12px rgba(48,209,88,0.25); }
 
-    /* Stats */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
     .stat {
       background: var(--surface);
       padding: 14px;
@@ -146,20 +123,9 @@
       text-align: center;
       border: 1px solid var(--border);
     }
-    .stat .label {
-      font-size: 0.7rem;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-    .stat .value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--pri-light);
-    }
+    .stat .label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .stat .value { font-size: 1.6rem; font-weight: 700; color: var(--pri-light); }
 
-    /* Inputs */
     input, select, textarea {
       width: 100%;
       padding: 13px;
@@ -171,24 +137,13 @@
       margin-bottom: 10px;
       font-family: inherit;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid var(--primary);
-      outline-offset: 1px;
-    }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
 
-    /* List */
-    .list-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
     .done { text-decoration: line-through; opacity: 0.5; }
     .inflow { color: var(--green); font-weight: 600; }
     .outflow { color: var(--red); font-weight: 600; }
 
-    /* Bottom nav */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -220,41 +175,12 @@
     }
     .bottom-nav button.active { color: var(--primary); font-weight: 600; }
 
-    /* Map */
-    .map-container {
-      height: 220px;
-      border-radius: 14px;
-      margin: 8px 0;
-      border: 2px solid var(--primary);
-    }
-
-    /* Status */
-    .status-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 0.7rem;
-    }
+    .map-container { height: 220px; border-radius: 14px; margin: 8px 0; border: 2px solid var(--primary); }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: 600; font-size: 0.7rem; }
     .online { background: rgba(48,209,88,0.15); color: var(--green); }
     .offline { background: rgba(255,69,58,0.15); color: var(--red); }
-
-    /* Progress */
-    .progress-bar {
-      height: 8px;
-      background: var(--border);
-      border-radius: 4px;
-      margin: 8px 0;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.3s;
-    }
-
-    /* Password toggle */
+    .progress-bar { height: 8px; background: var(--border); border-radius: 4px; margin: 8px 0; }
+    .progress-fill { height: 100%; background: var(--primary); border-radius: 4px; width: 0%; transition: width 0.3s; }
     .pw-toggle { position: relative; }
     .pw-toggle input { padding-right: 40px; }
     .pw-toggle .eye {
@@ -268,8 +194,6 @@
       cursor: pointer;
       color: var(--text2);
     }
-
-    /* Modal */
     .modal {
       position: fixed;
       top: 0;
@@ -293,8 +217,6 @@
       overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
-
-    /* Role cards */
     .role-card {
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -316,34 +238,122 @@
 <div class="app" id="appContent">Loading...</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCwoI6bCBo2KNI_5yLRp7PKV7JYd6lGDmA",
+    authDomain: "muhuri-road.firebaseapp.com",
+    databaseURL: "https://muhuri-road-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "muhuri-road",
+    storageBucket: "muhuri-road.firebasestorage.app",
+    messagingSenderId: "684633763124",
+    appId: "1:684633763124:web:717221f0da5a37b9530961",
+    measurementId: "G-EHR12S7FX3"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
 <script>
 // ========== DATA ==========
-var tx        = JSON.parse(localStorage.getItem("tx")||"[]");
-var tasks     = JSON.parse(localStorage.getItem("tasks")||"[]");
-var ride      = JSON.parse(localStorage.getItem("ride")||'{"lat":-1.2759,"lng":36.69268,"avail":true}');
-var docs      = JSON.parse(localStorage.getItem("documents")||"[]");
-var plans     = JSON.parse(localStorage.getItem("plans")||"[]");
-var bg        = localStorage.getItem("bg")||"";
-var logo      = localStorage.getItem("logo")||"";
-var WA        = localStorage.getItem("wa")||"254795827853";
-var GROUP     = localStorage.getItem("group")||"#";
-var ceoPass   = localStorage.getItem("ceoPass")||"1234";
-var driverPass= localStorage.getItem("driverPass")||"0000";
-var debts     = JSON.parse(localStorage.getItem("debts")||'{"dad":145000,"equity":60000,"caritas":10000,"frpeter":15000}');
+var tx = [];
+var tasks = [];
+var ride = {lat:-1.2759, lng:36.69268, avail:true};
+var docs = [];
+var plans = [];
+var bg = "";
+var logo = "";
+var WA = "254795827853";
+var GROUP = "#";
+var ceoPass = "1234";
+var driverPass = "0000";
+var debts = {dad:145000, equity:60000, caritas:10000, frpeter:15000};
 
 function saveAll() {
-  localStorage.setItem("tx",JSON.stringify(tx));
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-  localStorage.setItem("ride",JSON.stringify(ride));
-  localStorage.setItem("documents",JSON.stringify(docs));
-  localStorage.setItem("plans",JSON.stringify(plans));
-  localStorage.setItem("bg",bg);
-  localStorage.setItem("logo",logo);
-  localStorage.setItem("wa",WA);
-  localStorage.setItem("group",GROUP);
-  localStorage.setItem("ceoPass",ceoPass);
-  localStorage.setItem("driverPass",driverPass);
-  localStorage.setItem("debts",JSON.stringify(debts));
+  localStorage.setItem("tx", JSON.stringify(tx));
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("ride", JSON.stringify(ride));
+  localStorage.setItem("documents", JSON.stringify(docs));
+  localStorage.setItem("plans", JSON.stringify(plans));
+  localStorage.setItem("bg", bg);
+  localStorage.setItem("logo", logo);
+  localStorage.setItem("wa", WA);
+  localStorage.setItem("group", GROUP);
+  localStorage.setItem("ceoPass", ceoPass);
+  localStorage.setItem("driverPass", driverPass);
+  localStorage.setItem("debts", JSON.stringify(debts));
+
+  db.collection("appData").doc("main").set({
+    tx: tx, tasks: tasks, ride: ride, docs: docs, plans: plans,
+    bg: bg, logo: logo, WA: WA, GROUP: GROUP,
+    ceoPass: ceoPass, driverPass: driverPass, debts: debts,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(err) { console.error("Sync error", err); });
+}
+
+function loadCloud() {
+  db.collection("appData").doc("main").get().then(function(doc) {
+    if (doc.exists) {
+      var d = doc.data();
+      if (d.tx) tx = d.tx;
+      if (d.tasks) tasks = d.tasks;
+      if (d.ride) ride = d.ride;
+      if (d.docs) docs = d.docs;
+      if (d.plans) plans = d.plans;
+      if (d.bg) bg = d.bg;
+      if (d.logo) logo = d.logo;
+      if (d.WA) WA = d.WA;
+      if (d.GROUP) GROUP = d.GROUP;
+      if (d.ceoPass) ceoPass = d.ceoPass;
+      if (d.driverPass) driverPass = d.driverPass;
+      if (d.debts) debts = d.debts;
+      saveLocalFromCloud();
+    } else {
+      autoInit();
+      saveAll();
+    }
+    renderApp();
+  }).catch(function(err) {
+    console.error("Load error", err);
+    renderApp();
+  });
+}
+
+function saveLocalFromCloud() {
+  localStorage.setItem("tx", JSON.stringify(tx));
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("ride", JSON.stringify(ride));
+  localStorage.setItem("documents", JSON.stringify(docs));
+  localStorage.setItem("plans", JSON.stringify(plans));
+  localStorage.setItem("bg", bg);
+  localStorage.setItem("logo", logo);
+  localStorage.setItem("wa", WA);
+  localStorage.setItem("group", GROUP);
+  localStorage.setItem("ceoPass", ceoPass);
+  localStorage.setItem("driverPass", driverPass);
+  localStorage.setItem("debts", JSON.stringify(debts));
+}
+
+function autoInit() {
+  var expenses = [
+    {type:"expense",amount:175000,note:"Tuktuk purchase"},
+    {type:"expense",amount:30000,note:"Purchase & Travel exp"},
+    {type:"expense",amount:50000,note:"Painting & body works"},
+    {type:"expense",amount:40000,note:"Stage payment"},
+    {type:"expense",amount:15000,note:"Clutch System"},
+    {type:"expense",amount:40000,note:"Engine & internal components"},
+    {type:"expense",amount:8000,note:"School fees"},
+    {type:"expense",amount:12000,note:"Miscellaneous (House)"}
+  ];
+  var capital = [
+    {type:"capital",amount:100000,note:"Dad gift"},
+    {type:"capital",amount:40000,note:"Equity sale"}
+  ];
+  expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+  capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
 }
 
 // ========== HELPERS ==========
@@ -635,7 +645,6 @@ function switchCEOTab(tab) {
     content += '<div class="card"><h2>🔐 Passwords</h2><label>CEO Password</label><div class="pw-toggle"><input type="password" id="ceoPassSet" value="'+ceoPass+'"><button class="eye" onclick="togglePassword(\'ceoPassSet\')">👁️</button></div><label>Driver Password</label><div class="pw-toggle"><input type="password" id="driverPassSet" value="'+driverPass+'"><button class="eye" onclick="togglePassword(\'driverPassSet\')">👁️</button></div><button class="btn" onclick="savePasswords()">Update</button></div>';
     content += '<div class="card"><h2>💾 Backup</h2><button class="btn" onclick="downloadBackup()">📥 Backup</button><input type="file" id="restoreFile" accept=".json"><button class="btn secondary" onclick="restoreBackup()">📤 Restore</button></div>';
     content += '<div class="card"><h2>🛠️ Repair</h2><button class="btn" onclick="validateData()">🔧 Fix</button></div>';
-    content += '<div class="card"><h2>💰 Load Initial Financials</h2><p style="font-size:0.8rem">Adds all 8 expenses, Dad gift, and Equity sale. Can be reloaded anytime.</p><button class="btn" onclick="loadInitials()">📥 Load / Reload Initial Transactions</button></div>';
     content += '<div class="card"><h2>📅 Frago</h2><button class="btn" onclick="openFragoModal()">📅 Open Frago</button></div>';
   }
   document.getElementById("ceoContent").innerHTML = content;
@@ -668,55 +677,79 @@ function addIncome() {
   saveAll();
   switchCEOTab("dash");
 }
-function importIncomeCSV() {
-  var f = document.getElementById("incomeCsvFile").files[0];
-  if (!f) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var lines = e.target.result.split(/\\r?\\n/);
-    var imp = 0;
-    for (var i=1; i<lines.length; i++) {
-      var cols = lines[i].split(",").map(function(c){return c.trim().replace(/^"|"$/g,"")});
-      if (cols.length<3) continue;
-      var ty = (cols[1]||"").toLowerCase();
-      if (ty!=="topup" && ty!=="advert" && ty!=="capital") continue;
-      var am = parseInt(cols[2]);
-      if (!am || am<=0) continue;
-      tx.push({type:ty, amount:am, note:cols[3]||"", date:new Date().toISOString()});
-      imp++;
-    }
-    saveAll();
-    switchCEOTab("dash");
-  };
-  reader.readAsText(f);
+
+// ========== DOWNLOAD EXCEL ==========
+function downloadExcel() {
+  var lines = [];
+  lines.push("ITEM,MONEY IN,MONEY OUT");
+  lines.push("Dad Gift," + getAmount("capital","Dad gift") + ",");
+  lines.push("Equity Sale," + getAmount("capital","Equity sale") + ",");
+  lines.push("Lease Income," + sumType("lease") + ",");
+  lines.push("Advert Income," + sumType("advert") + ",");
+  lines.push("CEO Top-ups," + sumType("topup") + ",");
+  var expenseMap = {};
+  tx.filter(function(t){return t.type==="expense"}).forEach(function(t){
+    var key = t.note || "Other Expense";
+    expenseMap[key] = (expenseMap[key]||0) + t.amount;
+  });
+  for (var key in expenseMap) {
+    lines.push(key + ",," + expenseMap[key]);
+  }
+  lines.push("Dad Loan Repayment,," + sumLoan("dad"));
+  lines.push("Equity Loan Repayment,," + sumLoan("equity"));
+  lines.push("Caritas Loan Repayment,," + sumLoan("caritas"));
+  lines.push("Fr Peter Loan Repayment,," + sumLoan("frpeter"));
+  lines.push("TOTAL," + getTotalMoneyIn() + "," + getTotalMoneyOut());
+  lines.push("BALANCE,," + getBalance());
+
+  var csv = lines.join("\n");
+  var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  var link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "muhuri_balance_sheet.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
-// ========== LOAD INITIAL FINANCIALS ==========
-function loadInitials() {
-  var already = localStorage.getItem("initialLoaded");
-  var msg = already ? "Initial transactions already exist. Reloading will add DUPLICATES. Continue?" :
-                     "This will add all 8 expenses plus Dad gift and Equity sale. Continue?";
-  if (!confirm(msg)) return;
-  var expenses = [
-    {type:"expense",amount:175000,note:"Tuktuk purchase"},
-    {type:"expense",amount:30000,note:"Purchase & Travel exp"},
-    {type:"expense",amount:50000,note:"Painting & body works"},
-    {type:"expense",amount:40000,note:"Stage payment"},
-    {type:"expense",amount:15000,note:"Clutch System"},
-    {type:"expense",amount:40000,note:"Engine & internal components"},
-    {type:"expense",amount:8000,note:"School fees"},
-    {type:"expense",amount:12000,note:"Miscellaneous (House)"}
-  ];
-  var capital = [
-    {type:"capital",amount:100000,note:"Dad gift"},
-    {type:"capital",amount:40000,note:"Equity sale"}
-  ];
-  expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
-  capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
-  localStorage.setItem("initialLoaded","true");
+// ========== FRAGO ==========
+function openFragoModal() {
+  var m = document.createElement("div");
+  m.className = "modal";
+  m.innerHTML = '<div class="modal-content"><h2>📅 Frago Planner</h2><button class="btn secondary" onclick="closeFragoModal()">Close</button><div id="fragoContent"></div></div>';
+  document.body.appendChild(m);
+  renderFragoInModal();
+}
+function closeFragoModal() {
+  var m = document.querySelector(".modal");
+  if (m) m.remove();
+}
+function renderFragoInModal() {
+  var c = document.getElementById("fragoContent");
+  if (!c) return;
+  c.innerHTML = '<div class="card"><h2>➕ New Plan</h2><input type="text" id="planTitle" placeholder="Title"><textarea id="planContent" rows="4" placeholder="Tasks..."></textarea><select id="planType"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select><button class="btn" onclick="addPlan()">💾 Save Plan</button></div><div class="card"><h2>📋 Saved Plans</h2><div id="planList"></div></div>';
+  renderPlans();
+}
+function addPlan() {
+  var ti = document.getElementById("planTitle").value.trim();
+  var co = document.getElementById("planContent").value.trim();
+  var ty = document.getElementById("planType").value;
+  if (!ti) return;
+  plans.push({id:Date.now(), title:ti, content:co, type:ty});
   saveAll();
-  alert("Initial transactions loaded. Finances updated.");
-  switchCEOTab("finances");
+  renderPlans();
+}
+function deletePlan(id) {
+  plans = plans.filter(function(p){return p.id!==id});
+  saveAll();
+  renderPlans();
+}
+function renderPlans() {
+  var l = document.getElementById("planList");
+  if (!l) return;
+  l.innerHTML = plans.length ? plans.map(function(p){
+    return '<div class="list-item"><span><strong>'+p.title+'</strong> ('+p.type+')</span><button onclick="deletePlan('+p.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
+  }).join("") : '🔨 No plans saved.';
 }
 
 // ========== TASKS ==========
@@ -758,7 +791,7 @@ function saveDocument() {
 }
 function viewDocument(id) {
   var d = docs.find(function(x){return x.id===id});
-  if (d) alert(d.title + "\\n\\n" + d.content);
+  if (d) alert(d.title + "\n\n" + d.content);
 }
 function deleteDocument(id) {
   docs = docs.filter(function(x){return x.id!==id});
@@ -874,81 +907,6 @@ function validateData() {
   alert("Data fixed");
 }
 
-// ========== DOWNLOAD EXCEL ==========
-function downloadExcel() {
-  var lines = [];
-  lines.push("ITEM,MONEY IN,MONEY OUT");
-  lines.push("Dad Gift," + getAmount("capital","Dad gift") + ",");
-  lines.push("Equity Sale," + getAmount("capital","Equity sale") + ",");
-  lines.push("Lease Income," + sumType("lease") + ",");
-  lines.push("Advert Income," + sumType("advert") + ",");
-  lines.push("CEO Top-ups," + sumType("topup") + ",");
-  var expenseMap = {};
-  tx.filter(function(t){return t.type==="expense"}).forEach(function(t){
-    var key = t.note || "Other Expense";
-    expenseMap[key] = (expenseMap[key]||0) + t.amount;
-  });
-  for (var key in expenseMap) {
-    lines.push(key + ",," + expenseMap[key]);
-  }
-  lines.push("Dad Loan Repayment,," + sumLoan("dad"));
-  lines.push("Equity Loan Repayment,," + sumLoan("equity"));
-  lines.push("Caritas Loan Repayment,," + sumLoan("caritas"));
-  lines.push("Fr Peter Loan Repayment,," + sumLoan("frpeter"));
-  lines.push("TOTAL," + getTotalMoneyIn() + "," + getTotalMoneyOut());
-  lines.push("BALANCE,," + getBalance());
-
-  var csv = lines.join("\n");
-  var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  var link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "muhuri_balance_sheet.csv";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  setTimeout(function(){ URL.revokeObjectURL(link.href); }, 100);
-}
-
-// ========== FRAGO ==========
-function openFragoModal() {
-  var m = document.createElement("div");
-  m.className = "modal";
-  m.innerHTML = '<div class="modal-content"><h2>📅 Frago Planner</h2><button class="btn secondary" onclick="closeFragoModal()">Close</button><div id="fragoContent"></div></div>';
-  document.body.appendChild(m);
-  renderFragoInModal();
-}
-function closeFragoModal() {
-  var m = document.querySelector(".modal");
-  if (m) m.remove();
-}
-function renderFragoInModal() {
-  var c = document.getElementById("fragoContent");
-  if (!c) return;
-  c.innerHTML = '<div class="card"><h2>➕ New Plan (Template)</h2><input type="text" id="planTitle" value="Week 14: Tuktuk Operations"><textarea id="planContent" rows="4">Tasks:\n1. Collect lease KSh 1,000\n2. Repay Dad KSh 500\n3. Service tuktuk (oil change)\n4. Check tyre pressure\n\nGoals:\n- Save KSh 3,000 this week\n- Get one new advertising client\n\nReview:\n- Check GPS log\n- Update driver payment record</textarea><select id="planType"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select><button class="btn" onclick="addPlan()">💾 Save Plan</button></div><div class="card"><h2>📋 Saved Plans</h2><div id="planList"></div></div>';
-  renderPlans();
-}
-function addPlan() {
-  var ti = document.getElementById("planTitle").value.trim();
-  var co = document.getElementById("planContent").value.trim();
-  var ty = document.getElementById("planType").value;
-  if (!ti) return;
-  plans.push({id:Date.now(), title:ti, content:co, type:ty});
-  saveAll();
-  renderPlans();
-}
-function deletePlan(id) {
-  plans = plans.filter(function(p){return p.id!==id});
-  saveAll();
-  renderPlans();
-}
-function renderPlans() {
-  var l = document.getElementById("planList");
-  if (!l) return;
-  l.innerHTML = plans.length ? plans.map(function(p){
-    return '<div class="list-item"><span><strong>'+p.title+'</strong> ('+p.type+')</span><button onclick="deletePlan('+p.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
-  }).join("") : '🔨 No plans saved.';
-}
-
 // ========== MISC ==========
 function togglePassword(id) {
   var el = document.getElementById(id);
@@ -961,34 +919,9 @@ function goHome() {
   renderHome();
 }
 
-// ========== AUTO LOAD INITIAL FINANCIALS ==========
-(function() {
-  if (tx.length === 0) {
-    var expenses = [
-      {type:"expense",amount:175000,note:"Tuktuk purchase"},
-      {type:"expense",amount:30000,note:"Purchase & Travel exp"},
-      {type:"expense",amount:50000,note:"Painting & body works"},
-      {type:"expense",amount:40000,note:"Stage payment"},
-      {type:"expense",amount:15000,note:"Clutch System"},
-      {type:"expense",amount:40000,note:"Engine & internal components"},
-      {type:"expense",amount:8000,note:"School fees"},
-      {type:"expense",amount:12000,note:"Miscellaneous (House)"}
-    ];
-    var capital = [
-      {type:"capital",amount:100000,note:"Dad gift"},
-      {type:"capital",amount:40000,note:"Equity sale"}
-    ];
-    expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
-    capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
-    saveAll();
-  }
-})();
-
 // ========== STARTUP ==========
 if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
-document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
-renderApp();
-
+loadCloud();
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 </script>
 </body>
