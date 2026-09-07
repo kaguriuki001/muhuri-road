@@ -801,6 +801,29 @@ function goHome() {
 // ========== STARTUP ==========
 if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
 document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
+// Auto-load initial financials if no transactions exist yet
+(function() {
+  if (tx.length === 0) {
+    var expenses = [
+      {type:"expense",amount:175000,note:"Tuktuk purchase"},
+      {type:"expense",amount:30000,note:"Purchase & Travel exp"},
+      {type:"expense",amount:50000,note:"Painting & body works"},
+      {type:"expense",amount:40000,note:"Stage payment"},
+      {type:"expense",amount:15000,note:"Clutch System"},
+      {type:"expense",amount:40000,note:"Engine & internal components"},
+      {type:"expense",amount:8000,note:"School fees"},
+      {type:"expense",amount:12000,note:"Miscellaneous (House)"}
+    ];
+    var capital = [
+      {type:"capital",amount:100000,note:"Dad gift"},
+      {type:"capital",amount:40000,note:"Equity sale"}
+    ];
+    expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+    capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+    saveAll();
+  }
+})();
+
 renderApp();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
