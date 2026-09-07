@@ -294,34 +294,6 @@ function saveAll() {
   }).catch(function(err) { console.error("Sync error", err); });
 }
 
-function loadCloud() {
-  db.collection("appData").doc("main").get().then(function(doc) {
-    if (doc.exists) {
-      var d = doc.data();
-      if (d.tx) tx = d.tx;
-      if (d.tasks) tasks = d.tasks;
-      if (d.ride) ride = d.ride;
-      if (d.docs) docs = d.docs;
-      if (d.plans) plans = d.plans;
-      if (d.bg) bg = d.bg;
-      if (d.logo) logo = d.logo;
-      if (d.WA) WA = d.WA;
-      if (d.GROUP) GROUP = d.GROUP;
-      if (d.ceoPass) ceoPass = d.ceoPass;
-      if (d.driverPass) driverPass = d.driverPass;
-      if (d.debts) debts = d.debts;
-      saveLocalFromCloud();
-    } else {
-      autoInit();
-      saveAll();
-    }
-    renderApp();
-  }).catch(function(err) {
-    console.error("Load error", err);
-    renderApp();
-  });
-}
-
 function saveLocalFromCloud() {
   localStorage.setItem("tx", JSON.stringify(tx));
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -354,6 +326,58 @@ function autoInit() {
   ];
   expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
   capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+}
+
+function loadCloud() {
+  // 1. Load local first
+  var localTx = JSON.parse(localStorage.getItem("tx") || "null");
+  if (localTx && localTx.length > 0) {
+    tx = localTx;
+    tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    ride = JSON.parse(localStorage.getItem("ride") || '{"lat":-1.2759,"lng":36.69268,"avail":true}');
+    docs = JSON.parse(localStorage.getItem("documents") || "[]");
+    plans = JSON.parse(localStorage.getItem("plans") || "[]");
+    bg = localStorage.getItem("bg") || "";
+    logo = localStorage.getItem("logo") || "";
+    WA = localStorage.getItem("wa") || "254795827853";
+    GROUP = localStorage.getItem("group") || "#";
+    ceoPass = localStorage.getItem("ceoPass") || "1234";
+    driverPass = localStorage.getItem("driverPass") || "0000";
+    debts = JSON.parse(localStorage.getItem("debts") || '{"dad":145000,"equity":60000,"caritas":10000,"frpeter":15000}');
+  }
+
+  // 2. Try cloud
+  db.collection("appData").doc("main").get().then(function(doc) {
+    if (doc.exists) {
+      var d = doc.data();
+      if (d.tx) tx = d.tx;
+      if (d.tasks) tasks = d.tasks;
+      if (d.ride) ride = d.ride;
+      if (d.docs) docs = d.docs;
+      if (d.plans) plans = d.plans;
+      if (d.bg) bg = d.bg;
+      if (d.logo) logo = d.logo;
+      if (d.WA) WA = d.WA;
+      if (d.GROUP) GROUP = d.GROUP;
+      if (d.ceoPass) ceoPass = d.ceoPass;
+      if (d.driverPass) driverPass = d.driverPass;
+      if (d.debts) debts = d.debts;
+      saveLocalFromCloud();
+    } else {
+      if (tx.length === 0) {
+        autoInit();
+        saveAll();
+      }
+    }
+    renderApp();
+  }).catch(function(err) {
+    console.error("Cloud load error", err);
+    if (tx.length === 0) {
+      autoInit();
+      saveAll();
+    }
+    renderApp();
+  });
 }
 
 // ========== HELPERS ==========
