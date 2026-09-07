@@ -5,8 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Muhuri Road</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --card-bg: #ffffff;
+      --text: #111;
+      --text2: #6e6e73;
+      --border: #e5e5ea;
+      --primary: #ff6b00;
+      --pri-light: #ff8c33;
+      --green: #30d158;
+      --red: #ff453a;
+      --radius: 20px;
+      --shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+    body.dark {
       --bg: #0a0a0a;
       --surface: #1c1c1e;
       --card-bg: #2c2c2e;
@@ -15,135 +31,164 @@
       --border: #38383a;
       --primary: #ff6b00;
       --pri-light: #ff8c33;
-      --green: #30d158;
-      --red: #ff453a;
-      --radius: 16px;
-    }
-    body.light {
-      --bg: #f2f2f7;
-      --surface: #fff;
-      --card-bg: #fff;
-      --text: #000;
-      --text2: #6c6c70;
-      --border: #e5e5ea;
-      --primary: #ff6b00;
-      --pri-light: #ff8c33;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.4;
+      line-height: 1.5;
       min-height: 100vh;
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      -webkit-tap-highlight-color: transparent;
     }
     .app {
-      width: 100%;
-      max-width: 1200px;
+      max-width: 480px;
       margin: 0 auto;
-      padding: 0 0 80px 0;
+      min-height: 100vh;
+      padding: 0 0 90px 0;
+      position: relative;
     }
+    @media (min-width: 768px) {
+      .app { max-width: 700px; }
+    }
+    @media (min-width: 1200px) {
+      .app { max-width: 900px; }
+    }
+
+    /* Header */
     .header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 14px 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      gap: 10px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--pri-light));
+      color: #fff;
+      border-radius: 0 0 24px 24px;
       position: sticky;
       top: 0;
       z-index: 10;
-      flex-wrap: wrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    .header .icon { font-size: 1.6rem; }
-    .header .logo-img { height: 2.2rem; width: auto; border-radius: 6px; }
+    .header .icon { font-size: 1.8rem; }
+    .header .logo-img { height: 2.4rem; width: auto; border-radius: 8px; }
     .header h1 { font-size: 1.3rem; font-weight: 700; flex: 1; }
     .back-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text);
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
       padding: 8px 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.85rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
+      backdrop-filter: blur(10px);
     }
-    .role-card {
+
+    /* Cards */
+    .card {
       background: var(--card-bg);
       border-radius: var(--radius);
-      padding: 16px;
-      margin: 10px;
-      text-align: center;
+      padding: 18px;
+      margin: 10px 16px;
+      box-shadow: var(--shadow);
       border: 1px solid var(--border);
-      cursor: pointer;
-      transition: box-shadow .2s;
-      flex: 1 1 250px;
+      animation: fadeIn 0.3s ease;
     }
-    .role-card:active { box-shadow: 0 0 0 2px var(--primary); }
-    .role-card .icon { font-size: 2.4rem; }
-    .role-card h2 { font-size: 1.2rem; margin: 8px 0; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+
+    /* Buttons */
     .btn {
       display: block;
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       border: none;
-      border-radius: var(--radius);
+      border-radius: 14px;
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
       margin: 8px 0;
       background: var(--primary);
       color: #fff;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(255,107,0,0.25);
     }
-    .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
-    .btn.green { background: var(--green); color: #000; }
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin: 0 10px 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    .btn:active { transform: scale(0.97); }
+    .btn.secondary {
+      background: var(--surface);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      box-shadow: none;
     }
-    .card h2 { font-size: 1.1rem; margin-bottom: 10px; color: var(--primary); }
+    .btn.green { background: var(--green); color: #000; box-shadow: 0 4px 12px rgba(48,209,88,0.25); }
+
+    /* Stats */
     .stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .stat {
       background: var(--surface);
-      padding: 12px;
-      border-radius: 12px;
+      padding: 14px;
+      border-radius: 16px;
       text-align: center;
+      border: 1px solid var(--border);
     }
-    .stat .label { font-size: .7rem; color: var(--text2); text-transform: uppercase; }
-    .stat .value { font-size: 1.5rem; font-weight: 700; color: var(--pri-light); }
+    .stat .label {
+      font-size: 0.7rem;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .stat .value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--pri-light);
+    }
+
+    /* Inputs */
     input, select, textarea {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text);
-      font-size: .95rem;
-      margin-bottom: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      font-family: inherit;
     }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 1px;
+    }
+
+    /* List */
     .list-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
-    .done { text-decoration: line-through; opacity: .5; }
+    .done { text-decoration: line-through; opacity: 0.5; }
     .inflow { color: var(--green); font-weight: 600; }
     .outflow { color: var(--red); font-weight: 600; }
+
+    /* Bottom nav */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -152,40 +197,49 @@
       background: var(--surface);
       display: flex;
       justify-content: space-around;
-      padding: 6px 0;
+      padding: 8px 0 6px;
       border-top: 1px solid var(--border);
       z-index: 100;
-      flex-wrap: wrap;
+      max-width: 480px;
+      margin: 0 auto;
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
     }
     .bottom-nav button {
       background: none;
       border: none;
       color: var(--text2);
-      font-size: .7rem;
+      font-size: 0.65rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
       cursor: pointer;
-      padding: 6px 10px;
-      flex: 1 1 auto;
+      padding: 4px 8px;
+      flex: 1;
     }
-    .bottom-nav button.active { color: var(--primary); }
+    .bottom-nav button.active { color: var(--primary); font-weight: 600; }
+
+    /* Map */
     .map-container {
       height: 220px;
-      border-radius: 12px;
+      border-radius: 14px;
       margin: 8px 0;
       border: 2px solid var(--primary);
     }
+
+    /* Status */
     .status-badge {
       display: inline-block;
       padding: 4px 10px;
       border-radius: 20px;
       font-weight: 600;
-      font-size: .7rem;
+      font-size: 0.7rem;
     }
-    .online { background: rgba(48,209,88,.2); color: var(--green); }
-    .offline { background: rgba(255,69,58,.2); color: var(--red); }
+    .online { background: rgba(48,209,88,0.15); color: var(--green); }
+    .offline { background: rgba(255,69,58,0.15); color: var(--red); }
+
+    /* Progress */
     .progress-bar {
       height: 8px;
       background: var(--border);
@@ -197,8 +251,10 @@
       background: var(--primary);
       border-radius: 4px;
       width: 0%;
-      transition: width .3s;
+      transition: width 0.3s;
     }
+
+    /* Password toggle */
     .pw-toggle { position: relative; }
     .pw-toggle input { padding-right: 40px; }
     .pw-toggle .eye {
@@ -210,29 +266,50 @@
       border: none;
       font-size: 1.2rem;
       cursor: pointer;
-      color: var(--text);
+      color: var(--text2);
     }
+
+    /* Modal */
     .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.7);
       z-index: 200;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 20px;
     }
     .modal-content {
       background: var(--card-bg);
       border-radius: var(--radius);
       padding: 20px;
-      max-width: 700px;
-      width: 90%;
+      max-width: 600px;
+      width: 100%;
       max-height: 80vh;
       overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+
+    /* Role cards */
+    .role-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px 16px;
+      margin: 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      flex: 1 1 200px;
+      box-shadow: var(--shadow);
+    }
+    .role-card:active { transform: scale(0.96); }
+    .role-card .icon { font-size: 2.8rem; }
+    .role-card h2 { font-size: 1.2rem; font-weight: 600; margin: 8px 0; }
   </style>
 </head>
 <body class="dark" id="body">
@@ -330,13 +407,14 @@ function renderApp() {
 
 // ========== HOME ==========
 function renderHome() {
-  var h = '<div style="text-align:center;padding-top:30px">';
-  h += logo ? '<img src="'+logo+'" style="max-width:180px; max-height:120px; margin-bottom:15px;" alt="Logo">' : '<div style="font-size:4rem">🛺</div>';
-  h += '<h1 style="margin:10px 0">Muhuri Road</h1></div>';
-  h += '<div style="display:flex;flex-wrap:wrap;justify-content:center">';
-  h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride, see location</p></div>';
+  var h = '<div style="text-align:center;padding-top:40px">';
+  h += logo ? '<img src="'+logo+'" style="max-width:180px; max-height:120px; margin-bottom:15px; border-radius:20px;" alt="Logo">' : '<div style="font-size:5rem">🛺</div>';
+  h += '<h1 style="font-size:2rem;font-weight:800;margin:10px 0">Muhuri Road</h1>';
+  h += '<p style="color:var(--text2);margin-bottom:20px">Tuko Njiani, Uko Safe</p></div>';
+  h += '<div style="display:flex;flex-wrap:wrap;justify-content:center;padding:0 8px">';
+  h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride</p></div>';
   h += '<div class="role-card" onclick="selectRole(\'driver\')"><div class="icon">🚖</div><h2>Driver</h2><p>View payments</p></div>';
-  h += '<div class="role-card" onclick="selectRole(\'ceo\')"><div class="icon">🚛</div><h2>CEO</h2><p>Full control panel</p></div>';
+  h += '<div class="role-card" onclick="selectRole(\'ceo\')"><div class="icon">🚛</div><h2>CEO</h2><p>Full control</p></div>';
   h += '</div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -356,7 +434,7 @@ function logoOrEmoji() {
 // ========== RIDER ==========
 var map, marker;
 function renderRide() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
   h += '<div class="card"><h2>📍 Live Location</h2><span class="status-badge online" id="rideBadge">🟢 Online</span><div id="rideMap" class="map-container"></div><p style="margin-top:8px;font-size:.8rem">Updated: <span id="rideUpdate">Never</span></p></div>';
   h += '<div class="card"><h2>📞 Book</h2><a class="btn" style="background:#25D366" id="waBook" href="#" target="_blank">💬 WhatsApp Booking</a><a class="btn secondary" id="waPriority" href="#" target="_blank">⭐ Priority (KSh 100/mo)</a></div>';
   h += '<div class="card"><h2>👥 Community</h2><a class="btn secondary" id="waGroup" href="#">💬 WhatsApp Group</a><a class="btn secondary" href="https://tiktok.com/@muhuriroad" target="_blank">🎵 TikTok</a><a class="btn secondary" href="https://instagram.com/muhuriroad" target="_blank">📸 Instagram</a></div>';
@@ -424,7 +502,7 @@ function updateRideUI() {
 
 // ========== DRIVER ==========
 function renderDriverLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="driverPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'driverPassInput\')">👁️</button></div><button class="btn" onclick="checkDriverPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -437,7 +515,7 @@ function checkDriverPass() {
 function renderDriver() {
   var driverTx = tx.filter(function(t){return t.type==="lease"});
   var total = driverTx.reduce(function(s,t){return s+t.amount},0);
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
   h += '<div class="card"><h2>💰 Lease Payments</h2><p style="font-size:1.8rem;font-weight:700;color:var(--primary)">' + total.toLocaleString() + ' KSh</p><p style="color:var(--text2)">Total paid to CEO</p></div>';
   h += '<div class="card"><h2>🧾 History</h2><div style="max-height:300px;overflow:auto">';
   if (driverTx.length) {
@@ -451,7 +529,7 @@ function renderDriver() {
 
 // ========== CEO ==========
 function renderCEOLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="ceoPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'ceoPassInput\')">👁️</button></div><button class="btn" onclick="checkCEOPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -462,7 +540,7 @@ function checkCEOPass() {
   } else { alert("Wrong password"); }
 }
 function renderCEO() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
   h += '<div id="ceoContent"></div>';
   h += '<div class="bottom-nav">';
   h += '<button id="bn-dash" class="active" onclick="switchCEOTab(\'dash\')">📊<span>Dashboard</span></button>';
@@ -822,12 +900,13 @@ function downloadExcel() {
 
   var csv = lines.join("\n");
   var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "muhuri_balance_sheet.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  var link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "muhuri_balance_sheet.csv";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(function(){ URL.revokeObjectURL(link.href); }, 100);
 }
 
 // ========== FRAGO ==========
