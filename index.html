@@ -684,68 +684,57 @@ function validateData() {
 
 // ========== DOWNLOAD EXCEL (BALANCE SHEET) ==========
 function downloadExcel() {
-  var lines = [];
-  lines.push("MUHURI ROAD BALANCE SHEET");
-  lines.push("");
-  lines.push("MONEY IN");
-  lines.push("Dad Gift: " + getAmount("capital", "Dad gift"));
-  lines.push("Equity Sale: " + getAmount("capital", "Equity sale"));
-  lines.push("Lease Income: " + sumType("lease"));
-  lines.push("Advert Income: " + sumType("advert"));
-  lines.push("CEO Top-ups: " + sumType("topup"));
-  lines.push("");
-  lines.push("TOTAL MONEY IN: " + getTotalMoneyIn());
-  lines.push("");
-  lines.push("MONEY OUT");
+  // Money In
+  var dadGift = getAmount("capital", "Dad gift");
+  var equitySale = getAmount("capital", "Equity sale");
+  var leaseIncome = sumType("lease");
+  var advertIncome = sumType("advert");
+  var topups = sumType("topup");
+  var totalMoneyIn = dadGift + equitySale + leaseIncome + advertIncome + topups;
 
+  // Money Out
   var expenseMap = {};
   tx.filter(function(t) { return t.type === "expense"; }).forEach(function(t) {
     var key = t.note || "Other Expense";
     expenseMap[key] = (expenseMap[key] || 0) + t.amount;
   });
+  var totalExpenses = 0;
+  for (var key in expenseMap) { totalExpenses += expenseMap[key]; }
+
+  var dadRepaid = sumLoan("dad");
+  var equityRepaid = sumLoan("equity");
+  var caritasRepaid = sumLoan("caritas");
+  var frpeterRepaid = sumLoan("frpeter");
+  var totalRepaid = dadRepaid + equityRepaid + caritasRepaid + frpeterRepaid;
+  var totalMoneyOut = totalExpenses + totalRepaid;
+
+  var balance = totalMoneyIn - totalMoneyOut;
+
+  var csv = "ITEM,MONEY IN,MONEY OUT\n";
+  csv += "Dad Gift," + dadGift + ",\n";
+  csv += "Equity Sale," + equitySale + ",\n";
+  csv += "Lease Income," + leaseIncome + ",\n";
+  csv += "Advert Income," + advertIncome + ",\n";
+  csv += "CEO Top-ups," + topups + ",\n";
+
   for (var key in expenseMap) {
-    lines.push(key + ": " + expenseMap[key]);
+    csv += key + ",," + expenseMap[key] + "\n";
   }
 
-  lines.push("");
-  lines.push("Dad Loan Repayment: " + sumLoan("dad"));
-  lines.push("Equity Loan Repayment: " + sumLoan("equity"));
-  lines.push("Caritas Loan Repayment: " + sumLoan("caritas"));
-  lines.push("Fr Peter Loan Repayment: " + sumLoan("frpeter"));
-  lines.push("");
-  lines.push("TOTAL MONEY OUT: " + getTotalMoneyOut());
-  lines.push("");
-  lines.push("BALANCE: " + getBalance());
+  csv += "Dad Loan Repayment,," + dadRepaid + "\n";
+  csv += "Equity Loan Repayment,," + equityRepaid + "\n";
+  csv += "Caritas Loan Repayment,," + caritasRepaid + "\n";
+  csv += "Fr Peter Loan Repayment,," + frpeterRepaid + "\n";
 
-  var csv = lines.join("\n");
+  csv += "TOTAL," + totalMoneyIn + "," + totalMoneyOut + "\n";
+  csv += "BALANCE,," + balance + "\n";
+
   var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "muhuri_balance_sheet.csv";
   a.click();
 }
-
-function sumType(type) {
-  return tx.filter(function(t) { return t.type === type; }).reduce(function(s, t) { return s + t.amount; }, 0);
-}
-function getAmount(type, note) {
-  return tx.filter(function(t) { return t.type === type && t.note === note; }).reduce(function(s, t) { return s + t.amount; }, 0);
-}
-function sumLoan(loan) {
-  return tx.filter(function(t) { return t.type === "repay" && t.loan === loan; }).reduce(function(s, t) { return s + t.amount; }, 0);
-}
-function getTotalMoneyIn() {
-  return getAmount("capital", "Dad gift") + getAmount("capital", "Equity sale") + sumType("lease") + sumType("advert") + sumType("topup");
-}
-function getTotalMoneyOut() {
-  var exp = tx.filter(function(t) { return t.type === "expense"; }).reduce(function(s, t) { return s + t.amount; }, 0);
-  var repay = tx.filter(function(t) { return t.type === "repay"; }).reduce(function(s, t) { return s + t.amount; }, 0);
-  return exp + repay;
-}
-function getBalance() {
-  return getTotalMoneyIn() - getTotalMoneyOut();
-}
-
 // ========== FRAGO ==========
 function openFragoModal() {
   var m = document.createElement("div");
