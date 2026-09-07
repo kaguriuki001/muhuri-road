@@ -40,105 +40,197 @@
       background-position: center;
       background-attachment: fixed;
     }
-    .app { max-width: 500px; margin: 0 auto; padding: 0 0 80px 0; }
+    .app {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 0 80px 0;
+    }
     .header {
-      display: flex; align-items: center; gap: 8px;
-      padding: 14px 16px; background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 10;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      flex-wrap: wrap;
     }
     .header .icon { font-size: 1.6rem; }
     .header .logo-img { height: 2.2rem; width: auto; border-radius: 6px; }
     .header h1 { font-size: 1.3rem; font-weight: 700; flex: 1; }
     .back-btn {
-      background: none; border: 1px solid var(--border); color: var(--text);
-      padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
-      display: flex; align-items: center; gap: 4px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .role-card {
-      background: var(--card-bg); border-radius: var(--radius);
-      padding: 16px; margin: 10px 16px; text-align: center;
-      border: 1px solid var(--border); cursor: pointer;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+      cursor: pointer;
       transition: box-shadow .2s;
+      flex: 1 1 250px;
     }
     .role-card:active { box-shadow: 0 0 0 2px var(--primary); }
     .role-card .icon { font-size: 2.4rem; }
     .role-card h2 { font-size: 1.2rem; margin: 8px 0; }
     .btn {
-      display: block; width: 100%; padding: 14px; border: none;
-      border-radius: var(--radius); font-weight: 600; font-size: 1rem;
-      cursor: pointer; margin: 8px 0; background: var(--primary); color: #fff;
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 8px 0;
+      background: var(--primary);
+      color: #fff;
     }
     .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
     .btn.green { background: var(--green); color: #000; }
     .card {
-      background: var(--card-bg); border-radius: var(--radius);
-      padding: 16px; margin: 0 16px 12px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 0 10px 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,.2);
     }
     .card h2 { font-size: 1.1rem; margin-bottom: 10px; color: var(--primary); }
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
     .stat {
-      background: var(--surface); padding: 12px; border-radius: 12px; text-align: center;
+      background: var(--surface);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
     }
     .stat .label { font-size: .7rem; color: var(--text2); text-transform: uppercase; }
     .stat .value { font-size: 1.5rem; font-weight: 700; color: var(--pri-light); }
     input, select, textarea {
-      width: 100%; padding: 12px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text); font-size: .95rem; margin-bottom: 8px;
+      width: 100%;
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: .95rem;
+      margin-bottom: 8px;
     }
     .list-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
     }
     .done { text-decoration: line-through; opacity: .5; }
     .inflow { color: var(--green); font-weight: 600; }
     .outflow { color: var(--red); font-weight: 600; }
     .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--surface); display: flex;
-      justify-content: space-around; padding: 6px 0;
-      border-top: 1px solid var(--border); z-index: 100;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      border-top: 1px solid var(--border);
+      z-index: 100;
+      flex-wrap: wrap;
     }
     .bottom-nav button {
-      background: none; border: none; color: var(--text2);
-      font-size: .7rem; display: flex; flex-direction: column;
-      align-items: center; gap: 2px; cursor: pointer; padding: 6px 10px;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: .7rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      padding: 6px 10px;
+      flex: 1 1 auto;
     }
     .bottom-nav button.active { color: var(--primary); }
     .map-container {
-      height: 220px; border-radius: 12px; margin: 8px 0;
+      height: 220px;
+      border-radius: 12px;
+      margin: 8px 0;
       border: 2px solid var(--primary);
     }
     .status-badge {
-      display: inline-block; padding: 4px 10px; border-radius: 20px;
-      font-weight: 600; font-size: .7rem;
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: .7rem;
     }
     .online { background: rgba(48,209,88,.2); color: var(--green); }
     .offline { background: rgba(255,69,58,.2); color: var(--red); }
     .progress-bar {
-      height: 8px; background: var(--border); border-radius: 4px; margin: 8px 0;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      margin: 8px 0;
     }
     .progress-fill {
-      height: 100%; background: var(--primary); border-radius: 4px; width: 0%;
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      width: 0%;
       transition: width .3s;
     }
     .pw-toggle { position: relative; }
     .pw-toggle input { padding-right: 40px; }
     .pw-toggle .eye {
-      position: absolute; right: 10px; top: 50%;
-      transform: translateY(-50%); background: none; border: none;
-      font-size: 1.2rem; cursor: pointer; color: var(--text);
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text);
     }
     .modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 200;
-      display: flex; align-items: center; justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .modal-content {
-      background: var(--card-bg); border-radius: var(--radius);
-      padding: 20px; max-width: 500px; width: 90%; max-height: 80vh;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
       overflow-y: auto;
     }
   </style>
@@ -197,6 +289,26 @@ function totalIncome() {
 function totalExpenses() {
   return tx.filter(function(t){return t.type==="expense"}).reduce(function(s,t){return s+t.amount},0);
 }
+function sumType(type) {
+  return tx.filter(function(t){return t.type===type}).reduce(function(s,t){return s+t.amount},0);
+}
+function getAmount(type, note) {
+  return tx.filter(function(t){return t.type===type && t.note===note}).reduce(function(s,t){return s+t.amount},0);
+}
+function sumLoan(loan) {
+  return tx.filter(function(t){return t.type==="repay" && t.loan===loan}).reduce(function(s,t){return s+t.amount},0);
+}
+function getTotalMoneyIn() {
+  return getAmount("capital","Dad gift") + getAmount("capital","Equity sale") + sumType("lease") + sumType("advert") + sumType("topup");
+}
+function getTotalMoneyOut() {
+  var exp = tx.filter(function(t){return t.type==="expense"}).reduce(function(s,t){return s+t.amount},0);
+  var repay = tx.filter(function(t){return t.type==="repay"}).reduce(function(s,t){return s+t.amount},0);
+  return exp + repay;
+}
+function getBalance() {
+  return getTotalMoneyIn() - getTotalMoneyOut();
+}
 
 // ========== ROUTING ==========
 var params = new URLSearchParams(window.location.search);
@@ -221,9 +333,11 @@ function renderHome() {
   var h = '<div style="text-align:center;padding-top:30px">';
   h += logo ? '<img src="'+logo+'" style="max-width:180px; max-height:120px; margin-bottom:15px;" alt="Logo">' : '<div style="font-size:4rem">🛺</div>';
   h += '<h1 style="margin:10px 0">Muhuri Road</h1></div>';
+  h += '<div style="display:flex;flex-wrap:wrap;justify-content:center">';
   h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride, see location</p></div>';
   h += '<div class="role-card" onclick="selectRole(\'driver\')"><div class="icon">🚖</div><h2>Driver</h2><p>View payments</p></div>';
   h += '<div class="role-card" onclick="selectRole(\'ceo\')"><div class="icon">🚛</div><h2>CEO</h2><p>Full control panel</p></div>';
+  h += '</div>';
   document.getElementById("appContent").innerHTML = h;
 }
 
@@ -682,59 +796,40 @@ function validateData() {
   alert("Data fixed");
 }
 
-// ========== DOWNLOAD EXCEL (BALANCE SHEET) ==========
+// ========== DOWNLOAD EXCEL ==========
 function downloadExcel() {
-  // Money In
-  var dadGift = getAmount("capital", "Dad gift");
-  var equitySale = getAmount("capital", "Equity sale");
-  var leaseIncome = sumType("lease");
-  var advertIncome = sumType("advert");
-  var topups = sumType("topup");
-  var totalMoneyIn = dadGift + equitySale + leaseIncome + advertIncome + topups;
-
-  // Money Out
+  var lines = [];
+  lines.push("ITEM,MONEY IN,MONEY OUT");
+  lines.push("Dad Gift," + getAmount("capital","Dad gift") + ",");
+  lines.push("Equity Sale," + getAmount("capital","Equity sale") + ",");
+  lines.push("Lease Income," + sumType("lease") + ",");
+  lines.push("Advert Income," + sumType("advert") + ",");
+  lines.push("CEO Top-ups," + sumType("topup") + ",");
   var expenseMap = {};
-  tx.filter(function(t) { return t.type === "expense"; }).forEach(function(t) {
+  tx.filter(function(t){return t.type==="expense"}).forEach(function(t){
     var key = t.note || "Other Expense";
-    expenseMap[key] = (expenseMap[key] || 0) + t.amount;
+    expenseMap[key] = (expenseMap[key]||0) + t.amount;
   });
-  var totalExpenses = 0;
-  for (var key in expenseMap) { totalExpenses += expenseMap[key]; }
-
-  var dadRepaid = sumLoan("dad");
-  var equityRepaid = sumLoan("equity");
-  var caritasRepaid = sumLoan("caritas");
-  var frpeterRepaid = sumLoan("frpeter");
-  var totalRepaid = dadRepaid + equityRepaid + caritasRepaid + frpeterRepaid;
-  var totalMoneyOut = totalExpenses + totalRepaid;
-
-  var balance = totalMoneyIn - totalMoneyOut;
-
-  var csv = "ITEM,MONEY IN,MONEY OUT\n";
-  csv += "Dad Gift," + dadGift + ",\n";
-  csv += "Equity Sale," + equitySale + ",\n";
-  csv += "Lease Income," + leaseIncome + ",\n";
-  csv += "Advert Income," + advertIncome + ",\n";
-  csv += "CEO Top-ups," + topups + ",\n";
-
   for (var key in expenseMap) {
-    csv += key + ",," + expenseMap[key] + "\n";
+    lines.push(key + ",," + expenseMap[key]);
   }
+  lines.push("Dad Loan Repayment,," + sumLoan("dad"));
+  lines.push("Equity Loan Repayment,," + sumLoan("equity"));
+  lines.push("Caritas Loan Repayment,," + sumLoan("caritas"));
+  lines.push("Fr Peter Loan Repayment,," + sumLoan("frpeter"));
+  lines.push("TOTAL," + getTotalMoneyIn() + "," + getTotalMoneyOut());
+  lines.push("BALANCE,," + getBalance());
 
-  csv += "Dad Loan Repayment,," + dadRepaid + "\n";
-  csv += "Equity Loan Repayment,," + equityRepaid + "\n";
-  csv += "Caritas Loan Repayment,," + caritasRepaid + "\n";
-  csv += "Fr Peter Loan Repayment,," + frpeterRepaid + "\n";
-
-  csv += "TOTAL," + totalMoneyIn + "," + totalMoneyOut + "\n";
-  csv += "BALANCE,," + balance + "\n";
-
-  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  var csv = lines.join("\n");
+  var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "muhuri_balance_sheet.csv";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
+
 // ========== FRAGO ==========
 function openFragoModal() {
   var m = document.createElement("div");
@@ -750,7 +845,7 @@ function closeFragoModal() {
 function renderFragoInModal() {
   var c = document.getElementById("fragoContent");
   if (!c) return;
-  c.innerHTML = '<div class="card"><h2>➕ New Plan (Template)</h2><input type="text" id="planTitle" value="Week 14: Tuktuk Operations"><textarea id="planContent" rows="4">Tasks:\\n1. Collect lease KSh 1,000\\n2. Repay Dad KSh 500\\n3. Service tuktuk (oil change)\\n4. Check tyre pressure\\n\\nGoals:\\n- Save KSh 3,000 this week\\n- Get one new advertising client\\n\\nReview:\\n- Check GPS log\\n- Update driver payment record</textarea><select id="planType"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select><button class="btn" onclick="addPlan()">💾 Save Plan</button></div><div class="card"><h2>📋 Saved Plans</h2><div id="planList"></div></div>';
+  c.innerHTML = '<div class="card"><h2>➕ New Plan (Template)</h2><input type="text" id="planTitle" value="Week 14: Tuktuk Operations"><textarea id="planContent" rows="4">Tasks:\n1. Collect lease KSh 1,000\n2. Repay Dad KSh 500\n3. Service tuktuk (oil change)\n4. Check tyre pressure\n\nGoals:\n- Save KSh 3,000 this week\n- Get one new advertising client\n\nReview:\n- Check GPS log\n- Update driver payment record</textarea><select id="planType"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select><button class="btn" onclick="addPlan()">💾 Save Plan</button></div><div class="card"><h2>📋 Saved Plans</h2><div id="planList"></div></div>';
   renderPlans();
 }
 function addPlan() {
@@ -787,10 +882,7 @@ function goHome() {
   renderHome();
 }
 
-// ========== STARTUP ==========
-if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
-document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
-// Auto-load initial financials if no transactions exist yet
+// ========== AUTO LOAD INITIAL FINANCIALS ==========
 (function() {
   if (tx.length === 0) {
     var expenses = [
@@ -813,6 +905,9 @@ document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
   }
 })();
 
+// ========== STARTUP ==========
+if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
+document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
 renderApp();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
