@@ -684,56 +684,66 @@ function validateData() {
 
 // ========== DOWNLOAD EXCEL (BALANCE SHEET) ==========
 function downloadExcel() {
-  var dadGift = tx.filter(t => t.type === "capital" && t.note === "Dad gift").reduce((s, t) => s + t.amount, 0);
-  var equitySale = tx.filter(t => t.type === "capital" && t.note === "Equity sale").reduce((s, t) => s + t.amount, 0);
-  var leaseIncome = tx.filter(t => t.type === "lease").reduce((s, t) => s + t.amount, 0);
-  var advertIncome = tx.filter(t => t.type === "advert").reduce((s, t) => s + t.amount, 0);
-  var topups = tx.filter(t => t.type === "topup").reduce((s, t) => s + t.amount, 0);
-  var totalIncome = dadGift + equitySale + leaseIncome + advertIncome + topups;
+  var lines = [];
+  lines.push("MUHURI ROAD BALANCE SHEET");
+  lines.push("");
+  lines.push("MONEY IN");
+  lines.push("Dad Gift: " + getAmount("capital", "Dad gift"));
+  lines.push("Equity Sale: " + getAmount("capital", "Equity sale"));
+  lines.push("Lease Income: " + sumType("lease"));
+  lines.push("Advert Income: " + sumType("advert"));
+  lines.push("CEO Top-ups: " + sumType("topup"));
+  lines.push("");
+  lines.push("TOTAL MONEY IN: " + getTotalMoneyIn());
+  lines.push("");
+  lines.push("MONEY OUT");
 
-  var expenseItems = {};
-  tx.filter(t => t.type === "expense").forEach(function(t) {
+  var expenseMap = {};
+  tx.filter(function(t) { return t.type === "expense"; }).forEach(function(t) {
     var key = t.note || "Other Expense";
-    expenseItems[key] = (expenseItems[key] || 0) + t.amount;
+    expenseMap[key] = (expenseMap[key] || 0) + t.amount;
   });
-  var totalExpenses = Object.values(expenseItems).reduce((s, v) => s + v, 0);
-
-  var dadRepaid = tx.filter(t => t.type === "repay" && t.loan === "dad").reduce((s, t) => s + t.amount, 0);
-  var equityRepaid = tx.filter(t => t.type === "repay" && t.loan === "equity").reduce((s, t) => s + t.amount, 0);
-  var caritasRepaid = tx.filter(t => t.type === "repay" && t.loan === "caritas").reduce((s, t) => s + t.amount, 0);
-  var frpeterRepaid = tx.filter(t => t.type === "repay" && t.loan === "frpeter").reduce((s, t) => s + t.amount, 0);
-  var totalRepaid = dadRepaid + equityRepaid + caritasRepaid + frpeterRepaid;
-
-  var netCash = totalIncome - totalExpenses - totalRepaid;
-
-  var csv = "MUHURI ROAD - BALANCE SHEET\\n";
-  csv += "Generated: " + new Date().toLocaleString() + "\\n\\n";
-  csv += "SECTION,ITEM,AMOUNT (KSh)\\n";
-  csv += "INCOME,Dad Gift," + dadGift + "\\n";
-  csv += "INCOME,Equity Sale," + equitySale + "\\n";
-  csv += "INCOME,Lease Income," + leaseIncome + "\\n";
-  csv += "INCOME,Advert Income," + advertIncome + "\\n";
-  csv += "INCOME,CEO Top-ups," + topups + "\\n";
-  csv += "INCOME,TOTAL INCOME," + totalIncome + "\\n\\n";
-
-  for (var key in expenseItems) {
-    csv += "EXPENSE," + key + "," + expenseItems[key] + "\\n";
+  for (var key in expenseMap) {
+    lines.push(key + ": " + expenseMap[key]);
   }
-  csv += "EXPENSE,TOTAL EXPENSES," + totalExpenses + "\\n\\n";
 
-  csv += "REPAYMENT,Dad Loan," + dadRepaid + "\\n";
-  csv += "REPAYMENT,Equity Loan," + equityRepaid + "\\n";
-  csv += "REPAYMENT,Caritas Loan," + caritasRepaid + "\\n";
-  csv += "REPAYMENT,Fr. Peter Loan," + frpeterRepaid + "\\n";
-  csv += "REPAYMENT,TOTAL REPAID," + totalRepaid + "\\n\\n";
+  lines.push("");
+  lines.push("Dad Loan Repayment: " + sumLoan("dad"));
+  lines.push("Equity Loan Repayment: " + sumLoan("equity"));
+  lines.push("Caritas Loan Repayment: " + sumLoan("caritas"));
+  lines.push("Fr Peter Loan Repayment: " + sumLoan("frpeter"));
+  lines.push("");
+  lines.push("TOTAL MONEY OUT: " + getTotalMoneyOut());
+  lines.push("");
+  lines.push("BALANCE: " + getBalance());
 
-  csv += "SUMMARY,NET CASH," + netCash + "\\n";
-
-  var blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  var csv = lines.join("\n");
+  var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "muhuri_balance_sheet.csv";
   a.click();
+}
+
+function sumType(type) {
+  return tx.filter(function(t) { return t.type === type; }).reduce(function(s, t) { return s + t.amount; }, 0);
+}
+function getAmount(type, note) {
+  return tx.filter(function(t) { return t.type === type && t.note === note; }).reduce(function(s, t) { return s + t.amount; }, 0);
+}
+function sumLoan(loan) {
+  return tx.filter(function(t) { return t.type === "repay" && t.loan === loan; }).reduce(function(s, t) { return s + t.amount; }, 0);
+}
+function getTotalMoneyIn() {
+  return getAmount("capital", "Dad gift") + getAmount("capital", "Equity sale") + sumType("lease") + sumType("advert") + sumType("topup");
+}
+function getTotalMoneyOut() {
+  var exp = tx.filter(function(t) { return t.type === "expense"; }).reduce(function(s, t) { return s + t.amount; }, 0);
+  var repay = tx.filter(function(t) { return t.type === "repay"; }).reduce(function(s, t) { return s + t.amount; }, 0);
+  return exp + repay;
+}
+function getBalance() {
+  return getTotalMoneyIn() - getTotalMoneyOut();
 }
 
 // ========== FRAGO ==========
