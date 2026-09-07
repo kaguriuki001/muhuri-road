@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Muhuri Road</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #1c1c1e;
+      --card-bg: #2c2c2e;
+      --text: #fff;
+      --text2: #8e8e93;
+      --border: #38383a;
+      --primary: #ff6b00;
+      --pri-light: #ff8c33;
+      --green: #30d158;
+      --red: #ff453a;
+      --radius: 16px;
+    }
+    body.light {
+      --bg: #f2f2f7;
+      --surface: #fff;
+      --card-bg: #fff;
+      --text: #000;
+      --text2: #6c6c70;
+      --border: #e5e5ea;
+      --primary: #ff6b00;
+      --pri-light: #ff8c33;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .app { max-width: 500px; margin: 0 auto; padding: 0 0 80px 0; }
+    .header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 16px; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header .icon { font-size: 1.6rem; }
+    .header .logo-img { height: 2.2rem; width: auto; border-radius: 6px; }
+    .header h1 { font-size: 1.3rem; font-weight: 700; flex: 1; }
+    .back-btn {
+      background: none; border: 1px solid var(--border); color: var(--text);
+      padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .role-card {
+      background: var(--card-bg); border-radius: var(--radius);
+      padding: 16px; margin: 10px 16px; text-align: center;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: box-shadow .2s;
+    }
+    .role-card:active { box-shadow: 0 0 0 2px var(--primary); }
+    .role-card .icon { font-size: 2.4rem; }
+    .role-card h2 { font-size: 1.2rem; margin: 8px 0; }
+    .btn {
+      display: block; width: 100%; padding: 14px; border: none;
+      border-radius: var(--radius); font-weight: 600; font-size: 1rem;
+      cursor: pointer; margin: 8px 0; background: var(--primary); color: #fff;
+    }
+    .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
+    .btn.green { background: var(--green); color: #000; }
+    .card {
+      background: var(--card-bg); border-radius: var(--radius);
+      padding: 16px; margin: 0 16px 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 10px; color: var(--primary); }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .stat {
+      background: var(--surface); padding: 12px; border-radius: 12px; text-align: center;
+    }
+    .stat .label { font-size: .7rem; color: var(--text2); text-transform: uppercase; }
+    .stat .value { font-size: 1.5rem; font-weight: 700; color: var(--pri-light); }
+    input, select, textarea {
+      width: 100%; padding: 12px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font-size: .95rem; margin-bottom: 8px;
+    }
+    .list-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .done { text-decoration: line-through; opacity: .5; }
+    .inflow { color: var(--green); font-weight: 600; }
+    .outflow { color: var(--red); font-weight: 600; }
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface); display: flex;
+      justify-content: space-around; padding: 6px 0;
+      border-top: 1px solid var(--border); z-index: 100;
+    }
+    .bottom-nav button {
+      background: none; border: none; color: var(--text2);
+      font-size: .7rem; display: flex; flex-direction: column;
+      align-items: center; gap: 2px; cursor: pointer; padding: 6px 10px;
+    }
+    .bottom-nav button.active { color: var(--primary); }
+    .map-container {
+      height: 220px; border-radius: 12px; margin: 8px 0;
+      border: 2px solid var(--primary);
+    }
+    .status-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px;
+      font-weight: 600; font-size: .7rem;
+    }
+    .online { background: rgba(48,209,88,.2); color: var(--green); }
+    .offline { background: rgba(255,69,58,.2); color: var(--red); }
+    .progress-bar {
+      height: 8px; background: var(--border); border-radius: 4px; margin: 8px 0;
+    }
+    .progress-fill {
+      height: 100%; background: var(--primary); border-radius: 4px; width: 0%;
+      transition: width .3s;
+    }
+    .pw-toggle { position: relative; }
+    .pw-toggle input { padding-right: 40px; }
+    .pw-toggle .eye {
+      position: absolute; right: 10px; top: 50%;
+      transform: translateY(-50%); background: none; border: none;
+      font-size: 1.2rem; cursor: pointer; color: var(--text);
+    }
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: var(--card-bg); border-radius: var(--radius);
+      padding: 20px; max-width: 500px; width: 90%; max-height: 80vh;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="dark" id="body">
+<div class="app" id="appContent">Loading...</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ========== DATA ==========
+var tx        = JSON.parse(localStorage.getItem("tx")||"[]");
+var tasks     = JSON.parse(localStorage.getItem("tasks")||"[]");
+var ride      = JSON.parse(localStorage.getItem("ride")||'{"lat":-1.2759,"lng":36.69268,"avail":true}');
+var docs      = JSON.parse(localStorage.getItem("documents")||"[]");
+var plans     = JSON.parse(localStorage.getItem("plans")||"[]");
+var bg        = localStorage.getItem("bg")||"";
+var logo      = localStorage.getItem("logo")||"";
+var WA        = localStorage.getItem("wa")||"254795827853";
+var GROUP     = localStorage.getItem("group")||"#";
+var ceoPass   = localStorage.getItem("ceoPass")||"1234";
+var driverPass= localStorage.getItem("driverPass")||"0000";
+var debts     = JSON.parse(localStorage.getItem("debts")||'{"dad":145000,"equity":60000,"caritas":10000,"frpeter":15000}');
+
+function saveAll() {
+  localStorage.setItem("tx",JSON.stringify(tx));
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  localStorage.setItem("ride",JSON.stringify(ride));
+  localStorage.setItem("documents",JSON.stringify(docs));
+  localStorage.setItem("plans",JSON.stringify(plans));
+  localStorage.setItem("bg",bg);
+  localStorage.setItem("logo",logo);
+  localStorage.setItem("wa",WA);
+  localStorage.setItem("group",GROUP);
+  localStorage.setItem("ceoPass",ceoPass);
+  localStorage.setItem("driverPass",driverPass);
+  localStorage.setItem("debts",JSON.stringify(debts));
+}
+
+// ========== HELPERS ==========
+function repaidFor(loan) {
+  return tx.filter(function(t){return t.type==="repay" && t.loan===loan})
+           .reduce(function(s,t){return s+t.amount},0);
+}
+function totalDebt() {
+  var total = Object.values(debts).reduce(function(s,v){return s+v},0);
+  var repaid = tx.filter(function(t){return t.type==="repay"}).reduce(function(s,t){return s+t.amount},0);
+  return total - repaid;
+}
+function totalRepaidAll() {
+  return tx.filter(function(t){return t.type==="repay"}).reduce(function(s,t){return s+t.amount},0);
+}
+function totalIncome() {
+  return tx.filter(function(t){return ["lease","topup","advert","capital"].includes(t.type)})
+           .reduce(function(s,t){return s+t.amount},0);
+}
+function totalExpenses() {
+  return tx.filter(function(t){return t.type==="expense"}).reduce(function(s,t){return s+t.amount},0);
+}
+
+// ========== ROUTING ==========
+var params = new URLSearchParams(window.location.search);
+var page = params.get("page")||"home";
+var currentRole = null;
+var authenticated = false;
+
+function renderApp() {
+  if (page==="ride") { currentRole="rider"; authenticated=true; renderRide(); return; }
+  if (page==="driver") { currentRole="driver"; if(!authenticated) renderDriverLock(); else renderDriver(); return; }
+  if (page==="frago") { currentRole="ceo"; if(!authenticated) renderCEOLock(); else renderFrago(); return; }
+  if (!currentRole) { renderHome(); }
+  else {
+    if (currentRole==="rider") renderRide();
+    else if (currentRole==="driver") { if(!authenticated) renderDriverLock(); else renderDriver(); }
+    else if (currentRole==="ceo") { if(!authenticated) renderCEOLock(); else renderCEO(); }
+  }
+}
+
+// ========== HOME ==========
+function renderHome() {
+  var h = '<div style="text-align:center;padding-top:30px">';
+  h += logo ? '<img src="'+logo+'" style="max-width:180px; max-height:120px; margin-bottom:15px;" alt="Logo">' : '<div style="font-size:4rem">🛺</div>';
+  h += '<h1 style="margin:10px 0">Muhuri Road</h1></div>';
+  h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride, see location</p></div>';
+  h += '<div class="role-card" onclick="selectRole(\'driver\')"><div class="icon">🚖</div><h2>Driver</h2><p>View payments</p></div>';
+  h += '<div class="role-card" onclick="selectRole(\'ceo\')"><div class="icon">🚛</div><h2>CEO</h2><p>Full control panel</p></div>';
+  document.getElementById("appContent").innerHTML = h;
+}
+
+function selectRole(role) {
+  currentRole = role;
+  authenticated = false;
+  if (role==="rider") { page="ride"; renderRide(); }
+  else if (role==="driver") { page="driver"; renderDriverLock(); }
+  else if (role==="ceo") { page="ceo"; renderCEOLock(); }
+}
+
+function logoOrEmoji() {
+  return logo ? '<img class="logo-img" src="'+logo+'">' : '<span class="icon">🛺</span>';
+}
+
+// ========== RIDER ==========
+var map, marker;
+function renderRide() {
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  h += '<div class="card"><h2>📍 Live Location</h2><span class="status-badge online" id="rideBadge">🟢 Online</span><div id="rideMap" class="map-container"></div><p style="margin-top:8px;font-size:.8rem">Updated: <span id="rideUpdate">Never</span></p></div>';
+  h += '<div class="card"><h2>📞 Book</h2><a class="btn" style="background:#25D366" id="waBook" href="#" target="_blank">💬 WhatsApp Booking</a><a class="btn secondary" id="waPriority" href="#" target="_blank">⭐ Priority (KSh 100/mo)</a></div>';
+  h += '<div class="card"><h2>👥 Community</h2><a class="btn secondary" id="waGroup" href="#">💬 WhatsApp Group</a><a class="btn secondary" href="https://tiktok.com/@muhuriroad" target="_blank">🎵 TikTok</a><a class="btn secondary" href="https://instagram.com/muhuriroad" target="_blank">📸 Instagram</a></div>';
+  h += '<div class="card"><h2>🔧 Driver Panel</h2><label><input type="checkbox" id="availToggle" onchange="toggleAvail()"> <span id="availLabel">Offline</span></label><button class="btn" onclick="updateGPS()">📍 Update GPS</button><input type="text" id="manualCoords" placeholder="lat, lng"><button class="btn secondary" onclick="setManualLoc()">💾 Save</button></div>';
+  document.getElementById("appContent").innerHTML = h;
+  setTimeout(initRideMap, 300);
+  setTimeout(updateRideUI, 100);
+}
+
+function initRideMap() {
+  if (typeof L === "undefined") { setTimeout(initRideMap,500); return; }
+  if (map) { map.invalidateSize(); return; }
+  map = L.map("rideMap").setView([ride.lat, ride.lng], 15);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
+  marker = L.marker([ride.lat, ride.lng]).addTo(map).bindPopup("Muhuri Road Tuktuk").openPopup();
+}
+function updateGPS() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(p) {
+      ride.lat = p.coords.latitude;
+      ride.lng = p.coords.longitude;
+      ride.lastUpdate = Date.now();
+      saveAll();
+      if (marker) { marker.setLatLng([ride.lat, ride.lng]); map.setView([ride.lat, ride.lng], 15); }
+      updateRideUI();
+    });
+  } else { alert("GPS not supported"); }
+}
+function setManualLoc() {
+  var parts = document.getElementById("manualCoords").value.split(",");
+  if (parts.length===2) {
+    ride.lat = parseFloat(parts[0]);
+    ride.lng = parseFloat(parts[1]);
+    ride.lastUpdate = Date.now();
+    saveAll();
+    if (marker) { marker.setLatLng([ride.lat, ride.lng]); map.setView([ride.lat, ride.lng], 15); }
+    updateRideUI();
+  }
+}
+function toggleAvail() {
+  ride.avail = document.getElementById("availToggle").checked;
+  saveAll();
+  updateRideUI();
+}
+function updateRideUI() {
+  var badge = document.getElementById("rideBadge");
+  if (badge) {
+    badge.textContent = ride.avail ? "🟢 Online" : "🔴 Offline";
+    badge.className = "status-badge " + (ride.avail ? "online" : "offline");
+  }
+  var upd = document.getElementById("rideUpdate");
+  if (upd) upd.textContent = ride.lastUpdate ? new Date(ride.lastUpdate).toLocaleString() : "Never";
+  var msg = ride.avail ? "Habari! Nahitaji tuktuk Muhuri Road" : "Naulizia tuktuk";
+  var book = document.getElementById("waBook");
+  if (book) book.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+  var prio = document.getElementById("waPriority");
+  if (prio) prio.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent("Nataka Priority Membership (KSh 100/mo)");
+  var grp = document.getElementById("waGroup");
+  if (grp) grp.href = GROUP !== "#" ? "https://chat.whatsapp.com/" + GROUP : "#";
+  var tog = document.getElementById("availToggle");
+  if (tog) tog.checked = ride.avail;
+  var lab = document.getElementById("availLabel");
+  if (lab) lab.textContent = ride.avail ? "🟢 Available" : "🔴 Offline";
+}
+
+// ========== DRIVER ==========
+function renderDriverLock() {
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="driverPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'driverPassInput\')">👁️</button></div><button class="btn" onclick="checkDriverPass()">Unlock</button></div>';
+  document.getElementById("appContent").innerHTML = h;
+}
+function checkDriverPass() {
+  if (document.getElementById("driverPassInput").value === driverPass) {
+    authenticated = true;
+    renderDriver();
+  } else { alert("Wrong password"); }
+}
+function renderDriver() {
+  var driverTx = tx.filter(function(t){return t.type==="lease"});
+  var total = driverTx.reduce(function(s,t){return s+t.amount},0);
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  h += '<div class="card"><h2>💰 Lease Payments</h2><p style="font-size:1.8rem;font-weight:700;color:var(--primary)">' + total.toLocaleString() + ' KSh</p><p style="color:var(--text2)">Total paid to CEO</p></div>';
+  h += '<div class="card"><h2>🧾 History</h2><div style="max-height:300px;overflow:auto">';
+  if (driverTx.length) {
+    h += driverTx.map(function(t){return '<div class="list-item"><span>' + t.type.toUpperCase() + ' ' + (t.note||"") + '</span><span class="inflow">+' + t.amount.toLocaleString() + '</span></div>';}).join("");
+  } else {
+    h += "<p>🔨 No payments yet.</p>";
+  }
+  h += '</div></div>';
+  document.getElementById("appContent").innerHTML = h;
+}
+
+// ========== CEO ==========
+function renderCEOLock() {
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="ceoPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'ceoPassInput\')">👁️</button></div><button class="btn" onclick="checkCEOPass()">Unlock</button></div>';
+  document.getElementById("appContent").innerHTML = h;
+}
+function checkCEOPass() {
+  if (document.getElementById("ceoPassInput").value === ceoPass) {
+    authenticated = true;
+    renderCEO();
+  } else { alert("Wrong password"); }
+}
+function renderCEO() {
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button onclick="goHome()" style="background:none;border:none;font-size:1.5rem">🏠</button></div>';
+  h += '<div id="ceoContent"></div>';
+  h += '<div class="bottom-nav">';
+  h += '<button id="bn-dash" class="active" onclick="switchCEOTab(\'dash\')">📊<span>Dashboard</span></button>';
+  h += '<button id="bn-tasks" onclick="switchCEOTab(\'tasks\')">📋<span>Tasks</span></button>';
+  h += '<button id="bn-add" onclick="switchCEOTab(\'add\')">➕<span>Add</span></button>';
+  h += '<button id="bn-topup" onclick="switchCEOTab(\'topup\')">💰<span>Top‑up</span></button>';
+  h += '<button id="bn-finances" onclick="switchCEOTab(\'finances\')">📈<span>Finances</span></button>';
+  h += '<button id="bn-docs" onclick="switchCEOTab(\'documents\')">📄<span>Docs</span></button>';
+  h += '<button id="bn-settings" onclick="switchCEOTab(\'settings\')">⚙️<span>Settings</span></button>';
+  h += '</div>';
+  document.getElementById("appContent").innerHTML = h;
+  switchCEOTab("dash");
+}
+
+function switchCEOTab(tab) {
+  document.querySelectorAll(".bottom-nav button").forEach(function(b){b.classList.remove("active");});
+  document.getElementById("bn-"+tab).classList.add("active");
+  var content = "";
+  if (tab==="dash") {
+    var inc = totalIncome();
+    var rep = totalRepaidAll();
+    var exp = totalExpenses();
+    content = '<div class="card"><h2>📊 Dashboard</h2>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat"><div class="label">Total Income</div><div class="value">' + inc.toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Total Repaid</div><div class="value">' + rep.toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Total Debt Left</div><div class="value">' + totalDebt().toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Net Cash</div><div class="value">' + (inc-rep-exp).toLocaleString() + '</div></div>';
+    content += '</div>';
+    content += '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.min(100, (rep/(rep+totalDebt()||1))*100) + '%"></div></div>';
+    content += '<p style="font-size:.8rem">Overall Repaid: ' + ((rep/(rep+totalDebt()||1))*100).toFixed(1) + '%</p>';
+    content += '</div>';
+    content += '<div class="card"><h2>📋 Loan Details</h2>';
+    ["dad","equity","caritas","frpeter"].forEach(function(loan){
+      var original = debts[loan];
+      var repaid = repaidFor(loan);
+      var left = original - repaid;
+      content += '<p><strong>' + loan.toUpperCase() + '</strong> – ' + left.toLocaleString() + ' left of ' + original.toLocaleString() + '</p>';
+      content += '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.min(100,(repaid/original)*100) + '%"></div></div>';
+    });
+    content += '</div>';
+    content += '<div class="card"><h2>🧾 Recent</h2><div id="recentTx"></div></div>';
+    setTimeout(function(){
+      var recent = tx.slice().reverse().slice(0,10);
+      document.getElementById("recentTx").innerHTML = recent.length ? recent.map(function(t){
+        var s = ["lease","topup","advert","capital"].includes(t.type) ? "+" : "-";
+        return '<div class="list-item"><span>' + t.type.toUpperCase() + ' ' + (t.note||"") + '</span><span class="' + (s==="+"?"inflow":"outflow") + '">' + s + ' KSh ' + t.amount.toLocaleString() + '</span></div>';
+      }).join("") : '🔨 No transactions yet.';
+    },100);
+  }
+  else if (tab==="tasks") {
+    content = '<div class="card"><h2>📋 Tasks</h2><input type="text" id="newTask" placeholder="Add..."><button class="btn" onclick="addTask()">➕ Add</button><div id="taskList"></div></div>';
+    setTimeout(renderTasks,100);
+  }
+  else if (tab==="add") {
+    content = '<div class="card"><h2>➕ Transaction</h2><select id="txType" onchange="toggleLoanDropdown()"><option value="lease">Lease (Driver)</option><option value="repay">Repay Loan</option><option value="expense">Expense</option></select>';
+    content += '<div id="loanDropdown" style="display:none"><select id="loanType"><option value="dad">Dad</option><option value="equity">Equity</option><option value="caritas">Caritas</option><option value="frpeter">Fr. Peter</option></select></div>';
+    content += '<input type="number" id="txAmount" placeholder="Amount"><input type="text" id="txNote" placeholder="Note"><button class="btn" onclick="addTx()">SAVE</button></div>';
+  }
+  else if (tab==="topup") {
+    content = '<div class="card"><h2>💰 Extra Income</h2><select id="incomeType"><option value="topup">CEO Top‑up</option><option value="advert">Advert</option><option value="capital">Capital (Gift/Sale)</option></select><input type="number" id="incomeAmount" placeholder="Amount"><input type="text" id="incomeNote" placeholder="Note"><button class="btn" onclick="addIncome()">SAVE</button><hr><input type="file" id="incomeCsvFile" accept=".csv"><button class="btn secondary" onclick="importIncomeCSV()">📥 Import CSV</button></div>';
+  }
+  else if (tab==="finances") {
+    var inc = totalIncome();
+    var exp = totalExpenses();
+    var rep = totalRepaidAll();
+    content = '<div class="card"><h2>📈 Financial Tracking</h2>';
+    content += '<div class="stat-grid">';
+    content += '<div class="stat"><div class="label">Total Income</div><div class="value">' + inc.toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Total Amount Used (Expenses)</div><div class="value" style="color:var(--red)">' + exp.toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Total Repaid</div><div class="value">' + rep.toLocaleString() + '</div></div>';
+    content += '<div class="stat"><div class="label">Net Cash</div><div class="value">' + (inc - rep - exp).toLocaleString() + '</div></div>';
+    content += '</div>';
+    content += '<button class="btn green" onclick="downloadExcel()">📥 Download Excel</button>';
+    content += '<div class="card"><h2>🧾 All Expenses</h2><div style="max-height:300px;overflow:auto">';
+    var expenses = tx.filter(function(t){return t.type==="expense"}).reverse();
+    if (expenses.length) {
+      expenses.forEach(function(t){
+        content += '<div class="list-item"><span>' + t.note + '</span><span class="outflow">- ' + t.amount.toLocaleString() + '</span></div>';
+      });
+    } else { content += '<p>🔨 No expenses yet.</p>'; }
+    content += '</div></div>';
+  }
+  else if (tab==="documents") {
+    content = '<div class="card"><h2>📄 My Documents</h2><input type="text" id="docTitle" placeholder="Title"><textarea id="docContent" rows="3" placeholder="Content..."></textarea><button class="btn" onclick="saveDocument()">💾 Save</button><hr><h3>Saved</h3><div id="documentList"></div></div>';
+    setTimeout(renderDocuments,100);
+  }
+  else if (tab==="settings") {
+    content = '<div class="card"><h2>🖼️ Logo</h2><input type="url" id="logoUrl" placeholder="Image URL" value="'+(logo||"")+'"><button class="btn" onclick="setLogoUrl()">Apply URL</button><input type="file" id="logoFileInput" accept="image/*" style="margin-top:8px"><button class="btn secondary" onclick="setLogoFile()">📸 Upload</button><button class="btn secondary" style="background:#b71c1c; color:#fff;" onclick="removeLogo()">🗑️ Remove Logo</button></div>';
+    content += '<div class="card"><h2>📱 WhatsApp</h2><input type="text" id="waNumberInput" value="'+WA+'"><button class="btn" onclick="saveWA()">Save</button></div>';
+    content += '<div class="card"><h2>🖼️ Background</h2><input type="url" id="bgUrl" value="'+(bg||"")+'"><button class="btn" onclick="setBgUrl()">Apply URL</button><input type="file" id="bgFileInput" accept="image/*" style="margin-top:8px"><button class="btn secondary" onclick="setBgFile()">📸 Upload</button></div>';
+    content += '<div class="card"><h2>🔐 Passwords</h2><label>CEO Password</label><div class="pw-toggle"><input type="password" id="ceoPassSet" value="'+ceoPass+'"><button class="eye" onclick="togglePassword(\'ceoPassSet\')">👁️</button></div><label>Driver Password</label><div class="pw-toggle"><input type="password" id="driverPassSet" value="'+driverPass+'"><button class="eye" onclick="togglePassword(\'driverPassSet\')">👁️</button></div><button class="btn" onclick="savePasswords()">Update</button></div>';
+    content += '<div class="card"><h2>💾 Backup</h2><button class="btn" onclick="downloadBackup()">📥 Backup</button><input type="file" id="restoreFile" accept=".json"><button class="btn secondary" onclick="restoreBackup()">📤 Restore</button></div>';
+    content += '<div class="card"><h2>🛠️ Repair</h2><button class="btn" onclick="validateData()">🔧 Fix</button></div>';
+    content += '<div class="card"><h2>💰 Load Initial Financials</h2><p style="font-size:0.8rem">Adds all 8 expenses, Dad gift, and Equity sale. Can be reloaded anytime.</p><button class="btn" onclick="loadInitials()">📥 Load / Reload Initial Transactions</button></div>';
+    content += '<div class="card"><h2>📅 Frago</h2><button class="btn" onclick="openFragoModal()">📅 Open Frago</button></div>';
+  }
+  document.getElementById("ceoContent").innerHTML = content;
+}
+
+// ========== LOAN DROPDOWN ==========
+function toggleLoanDropdown() {
+  var t = document.getElementById("txType").value;
+  document.getElementById("loanDropdown").style.display = t==="repay" ? "block" : "none";
+}
+
+// ========== ADD TRANSACTIONS ==========
+function addTx() {
+  var ty = document.getElementById("txType").value;
+  var am = parseInt(document.getElementById("txAmount").value);
+  var note = document.getElementById("txNote").value;
+  if (!am || am<=0) return alert("Valid amount");
+  var obj = {type:ty, amount:am, note:note, date:new Date().toISOString()};
+  if (ty==="repay") obj.loan = document.getElementById("loanType").value;
+  tx.push(obj);
+  saveAll();
+  switchCEOTab("dash");
+}
+function addIncome() {
+  var ty = document.getElementById("incomeType").value;
+  var am = parseInt(document.getElementById("incomeAmount").value);
+  var note = document.getElementById("incomeNote").value;
+  if (!am || am<=0) return alert("Valid amount");
+  tx.push({type:ty, amount:am, note:note, date:new Date().toISOString()});
+  saveAll();
+  switchCEOTab("dash");
+}
+function importIncomeCSV() {
+  var f = document.getElementById("incomeCsvFile").files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var lines = e.target.result.split(/\\r?\\n/);
+    var imp = 0;
+    for (var i=1; i<lines.length; i++) {
+      var cols = lines[i].split(",").map(function(c){return c.trim().replace(/^"|"$/g,"")});
+      if (cols.length<3) continue;
+      var ty = (cols[1]||"").toLowerCase();
+      if (ty!=="topup" && ty!=="advert" && ty!=="capital") continue;
+      var am = parseInt(cols[2]);
+      if (!am || am<=0) continue;
+      tx.push({type:ty, amount:am, note:cols[3]||"", date:new Date().toISOString()});
+      imp++;
+    }
+    saveAll();
+    switchCEOTab("dash");
+  };
+  reader.readAsText(f);
+}
+
+// ========== LOAD INITIAL FINANCIALS ==========
+function loadInitials() {
+  var already = localStorage.getItem("initialLoaded");
+  var msg = already ? "Initial transactions already exist. Reloading will add DUPLICATES. Continue?" :
+                     "This will add all 8 expenses plus Dad gift and Equity sale. Continue?";
+  if (!confirm(msg)) return;
+  var expenses = [
+    {type:"expense",amount:175000,note:"Tuktuk purchase"},
+    {type:"expense",amount:30000,note:"Purchase & Travel exp"},
+    {type:"expense",amount:50000,note:"Painting & body works"},
+    {type:"expense",amount:40000,note:"Stage payment"},
+    {type:"expense",amount:15000,note:"Clutch System"},
+    {type:"expense",amount:40000,note:"Engine & internal components"},
+    {type:"expense",amount:8000,note:"School fees"},
+    {type:"expense",amount:12000,note:"Miscellaneous (House)"}
+  ];
+  var capital = [
+    {type:"capital",amount:100000,note:"Dad gift"},
+    {type:"capital",amount:40000,note:"Equity sale"}
+  ];
+  expenses.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+  capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
+  localStorage.setItem("initialLoaded","true");
+  saveAll();
+  alert("Initial transactions loaded. Finances updated.");
+  switchCEOTab("finances");
+}
+
+// ========== TASKS ==========
+function addTask() {
+  var txt = document.getElementById("newTask").value.trim();
+  if (!txt) return;
+  tasks.push({id:Date.now(), text:txt, done:false});
+  saveAll();
+  renderTasks();
+}
+function toggleTask(id) {
+  tasks = tasks.map(function(x){return x.id===id ? {id:x.id, text:x.text, done:!x.done} : x});
+  saveAll();
+  renderTasks();
+}
+function delTask(id) {
+  tasks = tasks.filter(function(x){return x.id!==id});
+  saveAll();
+  renderTasks();
+}
+function renderTasks() {
+  var list = document.getElementById("taskList");
+  if (!list) return;
+  list.innerHTML = tasks.length ? tasks.map(function(x){
+    return '<div class="list-item"><span class="'+(x.done?"done":"")+'">'+x.text+'</span><button onclick="toggleTask('+x.id+')" style="background:var(--primary);color:#fff;border:none;padding:4px 8px;border-radius:6px;">'+(x.done?"↩️":"✅")+'</button><button onclick="delTask('+x.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
+  }).join("") : '🔨 No tasks yet.';
+}
+
+// ========== DOCUMENTS ==========
+function saveDocument() {
+  var ti = document.getElementById("docTitle").value.trim();
+  var co = document.getElementById("docContent").value.trim();
+  if (!ti || !co) return;
+  docs.push({id:Date.now(), title:ti, content:co, created:new Date().toISOString()});
+  saveAll();
+  renderDocuments();
+  document.getElementById("docTitle").value = "";
+  document.getElementById("docContent").value = "";
+}
+function viewDocument(id) {
+  var d = docs.find(function(x){return x.id===id});
+  if (d) alert(d.title + "\\n\\n" + d.content);
+}
+function deleteDocument(id) {
+  docs = docs.filter(function(x){return x.id!==id});
+  saveAll();
+  renderDocuments();
+}
+function renderDocuments() {
+  var list = document.getElementById("documentList");
+  if (!list) return;
+  if (docs.length===0) { list.innerHTML = "<p>🔨 No documents saved.</p>"; return; }
+  var html = "";
+  for (var i=0; i<docs.length; i++) {
+    var d = docs[i];
+    html += '<div class="list-item"><span><strong>'+d.title+'</strong></span>';
+    html += '<button onclick="viewDocument('+d.id+')" style="background:var(--primary);color:#fff;border:none;padding:4px 8px;border-radius:6px;">👁️</button>';
+    html += '<button onclick="deleteDocument('+d.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+
+// ========== SETTINGS HELPERS ==========
+function setLogoUrl() {
+  logo = document.getElementById("logoUrl").value.trim();
+  saveAll();
+  renderCEO();
+  switchCEOTab("settings");
+}
+function setLogoFile() {
+  var f = document.getElementById("logoFileInput").files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    logo = e.target.result;
+    saveAll();
+    renderCEO();
+    switchCEOTab("settings");
+  };
+  reader.readAsDataURL(f);
+}
+function removeLogo() {
+  logo = "";
+  saveAll();
+  renderCEO();
+  switchCEOTab("settings");
+}
+function saveWA() {
+  WA = document.getElementById("waNumberInput").value.trim();
+  if (!WA) WA = "254795827853";
+  saveAll();
+  alert("Saved");
+}
+function setBgUrl() {
+  bg = document.getElementById("bgUrl").value;
+  saveAll();
+  document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
+}
+function setBgFile() {
+  var f = document.getElementById("bgFileInput").files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    bg = e.target.result;
+    saveAll();
+    document.body.style.backgroundImage = "url("+bg+")";
+  };
+  reader.readAsDataURL(f);
+}
+function savePasswords() {
+  ceoPass = document.getElementById("ceoPassSet").value || "1234";
+  driverPass = document.getElementById("driverPassSet").value || "0000";
+  saveAll();
+  alert("Passwords updated");
+}
+function downloadBackup() {
+  var data = {tx:tx,tasks:tasks,ride:ride,documents:docs,plans:plans,bg:bg,logo:logo,WA:WA,GROUP:GROUP,debts:debts};
+  var blob = new Blob([JSON.stringify(data)],{type:"application/json"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "muhuri_backup.json";
+  a.click();
+}
+function restoreBackup() {
+  var f = document.getElementById("restoreFile").files[0];
+  if (!f) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var d = JSON.parse(e.target.result);
+      if (d.tx) tx = d.tx;
+      if (d.tasks) tasks = d.tasks;
+      if (d.ride) ride = d.ride;
+      if (d.documents) docs = d.documents;
+      if (d.plans) plans = d.plans;
+      if (d.bg) { bg = d.bg; document.body.style.backgroundImage = "url("+bg+")"; }
+      if (d.logo) { logo = d.logo; }
+      if (d.WA) WA = d.WA;
+      if (d.GROUP) GROUP = d.GROUP;
+      if (d.debts) debts = d.debts;
+      saveAll();
+      switchCEOTab("dash");
+      alert("Restored");
+    } catch(err) { alert("Invalid file"); }
+  };
+  reader.readAsText(f);
+}
+function validateData() {
+  if (!Array.isArray(tx)) tx = [];
+  if (!Array.isArray(tasks)) tasks = [];
+  if (!Array.isArray(docs)) docs = [];
+  if (!Array.isArray(plans)) plans = [];
+  saveAll();
+  alert("Data fixed");
+}
+
+// ========== DOWNLOAD EXCEL ==========
+function downloadExcel() {
+  var csv = "Date,Type,Loan,Note,Amount (KSh)\\n";
+  tx.forEach(function(t) {
+    var date = t.date ? new Date(t.date).toLocaleString() : "";
+    var loan = t.loan ? t.loan : "";
+    csv += '"' + date + '","' + t.type + '","' + loan + '","' + (t.note||"") + '","' + t.amount + '"\\n';
+  });
+  csv += '\\n"","TOTAL INCOME","","' + totalIncome().toLocaleString() + '"\\n';
+  csv += '"","TOTAL EXPENSES","","' + totalExpenses().toLocaleString() + '"\\n';
+  var blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "muhuri_finances.csv";
+  a.click();
+}
+
+// ========== FRAGO ==========
+function openFragoModal() {
+  var m = document.createElement("div");
+  m.className = "modal";
+  m.innerHTML = '<div class="modal-content"><h2>📅 Frago Planner</h2><button class="btn secondary" onclick="closeFragoModal()">Close</button><div id="fragoContent"></div></div>';
+  document.body.appendChild(m);
+  renderFragoInModal();
+}
+function closeFragoModal() {
+  var m = document.querySelector(".modal");
+  if (m) m.remove();
+}
+function renderFragoInModal() {
+  var c = document.getElementById("fragoContent");
+  if (!c) return;
+  c.innerHTML = '<div class="card"><h2>➕ New Plan (Template)</h2><input type="text" id="planTitle" value="Week 14: Tuktuk Operations"><textarea id="planContent" rows="4">Tasks:\\n1. Collect lease KSh 1,000\\n2. Repay Dad KSh 500\\n3. Service tuktuk (oil change)\\n4. Check tyre pressure\\n\\nGoals:\\n- Save KSh 3,000 this week\\n- Get one new advertising client\\n\\nReview:\\n- Check GPS log\\n- Update driver payment record</textarea><select id="planType"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select><button class="btn" onclick="addPlan()">💾 Save Plan</button></div><div class="card"><h2>📋 Saved Plans</h2><div id="planList"></div></div>';
+  renderPlans();
+}
+function addPlan() {
+  var ti = document.getElementById("planTitle").value.trim();
+  var co = document.getElementById("planContent").value.trim();
+  var ty = document.getElementById("planType").value;
+  if (!ti) return;
+  plans.push({id:Date.now(), title:ti, content:co, type:ty});
+  saveAll();
+  renderPlans();
+}
+function deletePlan(id) {
+  plans = plans.filter(function(p){return p.id!==id});
+  saveAll();
+  renderPlans();
+}
+function renderPlans() {
+  var l = document.getElementById("planList");
+  if (!l) return;
+  l.innerHTML = plans.length ? plans.map(function(p){
+    return '<div class="list-item"><span><strong>'+p.title+'</strong> ('+p.type+')</span><button onclick="deletePlan('+p.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
+  }).join("") : '🔨 No plans saved.';
+}
+
+// ========== MISC ==========
+function togglePassword(id) {
+  var el = document.getElementById(id);
+  if (el) el.type = el.type==="password" ? "text" : "password";
+}
+function goHome() {
+  currentRole = null;
+  authenticated = false;
+  page = "home";
+  renderHome();
+}
+
+// ========== STARTUP ==========
+if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
+document.body.style.backgroundImage = bg ? "url("+bg+")" : "none";
+renderApp();
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
+</script>
+</body>
+</html>
