@@ -52,7 +52,7 @@
     @media (min-width: 768px) { .app { max-width: 700px; } }
     @media (min-width: 1200px) { .app { max-width: 900px; } }
 
-    /* SPLASH SCREEN */
+    /* SPLASH */
     #splash {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -74,6 +74,52 @@
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* TOP BAR (Uber-style) */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.6rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-btn:active { background: var(--border); }
+    .topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      flex: 1;
+      justify-content: center;
+    }
+    .topbar .brand .topbar-logo { height: 1.8rem; width: auto; border-radius: 6px; }
+    .topbar .theme-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 10px;
+    }
+
+    /* HEADER (for internal pages) */
     .header {
       display: flex;
       align-items: center;
@@ -101,17 +147,6 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      backdrop-filter: blur(10px);
-    }
-    .theme-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
     }
 
     .card {
@@ -147,15 +182,30 @@
     .btn:active { transform: scale(0.97); }
     .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); box-shadow: none; }
     .btn.green { background: var(--green); color: #000; box-shadow: 0 4px 12px rgba(48,209,88,0.25); }
+    .btn.uber { background: #000; color: #fff; box-shadow: none; }
+    body.dark .btn.uber { background: #fff; color: #000; }
 
-    /* TRUST BADGES */
+    /* LANDING HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--primary), var(--pri-light));
+      color: #fff;
+      padding: 40px 24px 60px;
+      border-radius: 0 0 30px 30px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: 0.5px; }
+    .hero p { font-size: 1rem; opacity: 0.95; margin-top: 8px; }
+    .hero .hero-icon { font-size: 4rem; margin-bottom: 10px; }
+
     .trust-badges {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
       padding: 0 16px;
-      margin: 10px 0 20px;
+      margin: -30px 0 20px;
+      position: relative;
+      z-index: 2;
     }
     .trust-badge {
       background: var(--card-bg);
@@ -200,12 +250,7 @@
     .inflow { color: var(--green); font-weight: 600; }
     .outflow { color: var(--red); font-weight: 600; }
 
-    /* EMPTY STATE */
-    .empty-state {
-      text-align: center;
-      padding: 30px 20px;
-      color: var(--text2);
-    }
+    .empty-state { text-align: center; padding: 30px 20px; color: var(--text2); }
     .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.8; }
     .empty-state .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .empty-state .empty-text { font-size: 0.9rem; line-height: 1.5; }
@@ -280,21 +325,37 @@
       overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
-    .role-card {
+
+    /* SETTINGS ROW (Uber-style menu items) */
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
       background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 24px 16px;
-      margin: 8px;
-      text-align: center;
-      border: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      flex: 1 1 200px;
-      box-shadow: var(--shadow);
+      transition: background 0.15s;
     }
-    .role-card:active { transform: scale(0.96); }
-    .role-card .icon { font-size: 2.8rem; }
-    .role-card h2 { font-size: 1.2rem; font-weight: 600; margin: 8px 0; }
+    .settings-row:active { background: var(--surface); }
+    .settings-row .row-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+    }
+    .settings-row .row-content { flex: 1; }
+    .settings-row .row-title { font-weight: 600; font-size: 1rem; }
+    .settings-row .row-subtitle { font-size: 0.8rem; color: var(--text2); margin-top: 2px; }
+    .settings-row .row-arrow { color: var(--text2); font-size: 1.2rem; }
+
+    .settings-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text2);
+      padding: 20px 16px 8px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="dark" id="body">
@@ -414,9 +475,8 @@ function loadCloud() {
     autoInit();
     saveAll();
   }
-  // Splash logo
   var sl = document.getElementById("splashLogo");
-  if (logo) {
+  if (logo && sl) {
     sl.outerHTML = '<img class="splash-logo-img" src="'+logo+'">';
   }
   renderApp();
@@ -491,7 +551,7 @@ function emptyState(icon, title, text) {
   return '<div class="empty-state"><div class="empty-icon">'+icon+'</div><div class="empty-title">'+title+'</div><div class="empty-text">'+text+'</div></div>';
 }
 
-// ========== THEME TOGGLE ==========
+// ========== THEME ==========
 function toggleTheme() {
   document.body.classList.toggle("dark");
   var isDark = document.body.classList.contains("dark");
@@ -506,56 +566,146 @@ var currentRole = null;
 var authenticated = false;
 
 function renderApp() {
-  if (page==="ride") { currentRole="rider"; authenticated=true; renderRide(); return; }
-  if (page==="driver") { currentRole="driver"; if(!authenticated) renderDriverLock(); else renderDriver(); return; }
-  if (page==="frago") { currentRole="ceo"; if(!authenticated) renderCEOLock(); else renderFrago(); return; }
-  if (!currentRole) { renderHome(); }
-  else {
-    if (currentRole==="rider") renderRide();
-    else if (currentRole==="driver") { if(!authenticated) renderDriverLock(); else renderDriver(); }
-    else if (currentRole==="ceo") { if(!authenticated) renderCEOLock(); else renderCEO(); }
-  }
+  if (page==="ride") { renderRide(); return; }
+  if (page==="driver") { if(!authenticated) renderDriverLock(); else renderDriver(); return; }
+  if (page==="ceo") { if(!authenticated) renderCEOLock(); else renderCEO(); return; }
+  if (page==="settings") { renderSettings(); return; }
+  renderLanding();
 }
 
-// ========== HOME ==========
-function renderHome() {
-  var h = '<div style="text-align:center;padding-top:30px">';
-  h += logo ? '<img src="'+logo+'" style="max-width:160px; max-height:110px; margin-bottom:15px; border-radius:20px;" alt="Logo">' : '<div style="font-size:5rem">🛺</div>';
-  h += '<h1 style="font-size:2rem;font-weight:800;margin:10px 0">Muhuri Road</h1>';
-  h += '<p style="color:var(--text2);margin-bottom:20px;font-weight:500">Tuko Njiani, Uko Safe</p></div>';
+// ========== LANDING (Uber-style Rider page) ==========
+function renderLanding() {
+  var h = '';
+  // Top bar
+  h += '<div class="topbar">';
+  h += '<button class="menu-btn" onclick="goSettings()">☰</button>';
+  h += '<div class="brand">' + (logo ? '<img class="topbar-logo" src="'+logo+'">' : '🛺') + '<span>Muhuri Road</span></div>';
+  h += '<button class="theme-btn" onclick="toggleTheme()">🌓</button>';
+  h += '</div>';
 
-  // TRUST BADGES
+  // Hero
+  h += '<div class="hero">';
+  h += '<div class="hero-icon">🛺</div>';
+  h += '<h1>Ride with Muhuri</h1>';
+  h += '<p>Tuko Njiani, Uko Safe</p>';
+  h += '</div>';
+
+  // Trust badges
   h += '<div class="trust-badges">';
   h += '<div class="trust-badge">✅ Verified Drivers</div>';
   h += '<div class="trust-badge">🛡️ GPS Tracked</div>';
   h += '<div class="trust-badge">⭐ 4.8 Rating</div>';
-  h += '<div class="trust-badge">📞 24/7 Support</div>';
+  h += '<div class="trust-badge">📞 24/7</div>';
   h += '</div>';
 
-  h += '<div style="display:flex;flex-wrap:wrap;justify-content:center;padding:0 8px">';
-  h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride</p></div>';
-  h += '<div class="role-card" onclick="selectRole(\'driver\')"><div class="icon">🚖</div><h2>Driver</h2><p>View payments</p></div>';
-  h += '<div class="role-card" onclick="selectRole(\'ceo\')"><div class="icon">🚛</div><h2>CEO</h2><p>Full control</p></div>';
+  // Book CTA
+  h += '<div class="card"><h2>📞 Book a Ride</h2>';
+  h += '<a class="btn uber" id="waBook" href="#" target="_blank">Book on WhatsApp</a>';
+  h += '<a class="btn secondary" id="waPriority" href="#" target="_blank">⭐ Priority (KSh 100/mo)</a>';
   h += '</div>';
+
+  // Live location
+  h += '<div class="card"><h2>📍 Live Location</h2>';
+  h += '<span class="status-badge online" id="rideBadge">🟢 Online</span>';
+  h += '<div id="rideMap" class="map-container"></div>';
+  h += '<p style="margin-top:8px;font-size:.8rem;color:var(--text2)">Updated: <span id="rideUpdate">Never</span></p>';
+  h += '</div>';
+
+  // Community
+  h += '<div class="card"><h2>👥 Community</h2>';
+  h += '<a class="btn secondary" id="waGroup" href="#">WhatsApp Group</a>';
+  h += '<a class="btn secondary" href="https://tiktok.com/@muhuriroad" target="_blank">🎵 TikTok</a>';
+  h += '<a class="btn secondary" href="https://instagram.com/muhuriroad" target="_blank">📸 Instagram</a>';
+  h += '</div>';
+
+  document.getElementById("appContent").innerHTML = h;
+  setTimeout(initRideMap, 300);
+  setTimeout(updateRideUI, 100);
+}
+
+function goSettings() {
+  page = "settings";
+  renderSettings();
+}
+
+// ========== SETTINGS (Uber-style, has Driver + CEO behind it) ==========
+function renderSettings() {
+  var h = '';
+  h += '<div class="topbar">';
+  h += '<button class="menu-btn" onclick="goHomeLanding()">←</button>';
+  h += '<div class="brand"><span>Settings</span></div>';
+  h += '<button class="theme-btn" onclick="toggleTheme()">🌓</button>';
+  h += '</div>';
+
+  h += '<div class="settings-section-title">Account</div>';
+
+  h += '<div class="settings-row" onclick="goDriverLogin()">';
+  h += '<div class="row-icon">🚖</div>';
+  h += '<div class="row-content"><div class="row-title">Driver Login</div><div class="row-subtitle">View your lease payments</div></div>';
+  h += '<div class="row-arrow">›</div>';
+  h += '</div>';
+
+  h += '<div class="settings-row" onclick="goCEOLogin()">';
+  h += '<div class="row-icon">🚛</div>';
+  h += '<div class="row-content"><div class="row-title">CEO Dashboard</div><div class="row-subtitle">Finances, loans, documents</div></div>';
+  h += '<div class="row-arrow">›</div>';
+  h += '</div>';
+
+  h += '<div class="settings-section-title">App</div>';
+
+  h += '<div class="settings-row" onclick="toggleTheme()">';
+  h += '<div class="row-icon">🌓</div>';
+  h += '<div class="row-content"><div class="row-title">Appearance</div><div class="row-subtitle">Switch dark / light mode</div></div>';
+  h += '<div class="row-arrow">›</div>';
+  h += '</div>';
+
+  h += '<div class="settings-section-title">Community</div>';
+
+  h += '<div class="settings-row" onclick="openLink(\'https://tiktok.com/@muhuriroad\')">';
+  h += '<div class="row-icon">🎵</div>';
+  h += '<div class="row-content"><div class="row-title">TikTok</div><div class="row-subtitle">@muhuriroad</div></div>';
+  h += '<div class="row-arrow">›</div>';
+  h += '</div>';
+
+  h += '<div class="settings-row" onclick="openLink(\'https://instagram.com/muhuriroad\')">';
+  h += '<div class="row-icon">📸</div>';
+  h += '<div class="row-content"><div class="row-title">Instagram</div><div class="row-subtitle">@muhuriroad</div></div>';
+  h += '<div class="row-arrow">›</div>';
+  h += '</div>';
+
+  h += '<div class="settings-section-title">About</div>';
+  h += '<div class="card" style="margin:10px 16px">';
+  h += '<p style="font-size:0.9rem;line-height:1.6;color:var(--text2)">Muhuri Road is a community tuktuk service on Muhuri Road and Gichecheni Road, Nairobi. Tuko Njiani, Uko Safe.</p>';
+  h += '<p style="margin-top:10px;font-size:0.8rem;color:var(--text2)">Version 2.0 &middot; Made in Kenya</p>';
+  h += '</div>';
+
+  h += '<div style="padding:0 16px 30px"><button class="btn secondary" onclick="goHomeLanding()">Back to Rider App</button></div>';
+
   document.getElementById("appContent").innerHTML = h;
 }
 
-function selectRole(role) {
-  currentRole = role;
+function goHomeLanding() {
+  page = "home";
+  renderLanding();
+}
+function goDriverLogin() {
+  page = "driver";
   authenticated = false;
-  if (role==="rider") { page="ride"; renderRide(); }
-  else if (role==="driver") { page="driver"; renderDriverLock(); }
-  else if (role==="ceo") { page="ceo"; renderCEOLock(); }
+  renderDriverLock();
+}
+function goCEOLogin() {
+  page = "ceo";
+  authenticated = false;
+  renderCEOLock();
+}
+function openLink(url) {
+  window.open(url, "_blank");
 }
 
-function logoOrEmoji() {
-  return logo ? '<img class="logo-img" src="'+logo+'">' : '<span class="icon">🛺</span>';
-}
-
-// ========== RIDER ==========
+/ ========== RIDE (public rider experience) ==========
 var map, marker;
 function renderRide() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHomeLanding()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button class="theme-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 12px;border-radius:10px;font-size:1.2rem;cursor:pointer" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card"><h2>📍 Live Location</h2><span class="status-badge online" id="rideBadge">🟢 Online</span><div id="rideMap" class="map-container"></div><p style="margin-top:8px;font-size:.8rem">Updated: <span id="rideUpdate">Never</span></p></div>';
   h += '<div class="card"><h2>📞 Book</h2><a class="btn" style="background:#25D366" id="waBook" href="#" target="_blank">💬 WhatsApp Booking</a><a class="btn secondary" id="waPriority" href="#" target="_blank">⭐ Priority (KSh 100/mo)</a></div>';
   h += '<div class="card"><h2>👥 Community</h2><a class="btn secondary" id="waGroup" href="#">💬 WhatsApp Group</a><a class="btn secondary" href="https://tiktok.com/@muhuriroad" target="_blank">🎵 TikTok</a><a class="btn secondary" href="https://instagram.com/muhuriroad" target="_blank">📸 Instagram</a></div>';
@@ -572,8 +722,6 @@ function initRideMap() {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
   marker = L.marker([ride.lat, ride.lng]).addTo(map).bindPopup("Muhuri Road Tuktuk").openPopup();
 }
-
-// REAL-TIME GPS
 function startGPS() {
   if (!navigator.geolocation) { alert("GPS not supported"); return; }
   if (gpsWatchId !== null) { alert("GPS already running"); return; }
@@ -587,9 +735,8 @@ function startGPS() {
       map.setView([ride.lat, ride.lng], 15);
     }
     updateRideUI();
-  }, function(err) {
-    console.error("GPS error", err);
-  }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+  }, function(err) { console.error("GPS error", err); },
+  { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
   alert("✅ Live GPS started. Location updates every 30 seconds.");
 }
 function stopGPS() {
@@ -635,9 +782,14 @@ function updateRideUI() {
   var lab = document.getElementById("availLabel");
   if (lab) lab.textContent = ride.avail ? "🟢 Available" : "🔴 Offline";
 }
+
+function logoOrEmoji() {
+  return logo ? '<img class="logo-img" src="'+logo+'">' : '<span class="icon">🛺</span>';
+}
+
 // ========== DRIVER ==========
 function renderDriverLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goSettings()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button class="theme-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 12px;border-radius:10px;font-size:1.2rem;cursor:pointer" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="driverPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'driverPassInput\')">👁️</button></div><button class="btn" onclick="checkDriverPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -650,7 +802,7 @@ function checkDriverPass() {
 function renderDriver() {
   var driverTx = tx.filter(function(t){return t.type==="lease"});
   var total = driverTx.reduce(function(s,t){return s+t.amount},0);
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goSettings()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button class="theme-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 12px;border-radius:10px;font-size:1.2rem;cursor:pointer" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card"><h2>💰 Lease Payments</h2><p style="font-size:1.8rem;font-weight:700;color:var(--primary)">' + total.toLocaleString() + ' KSh</p><p style="color:var(--text2)">Total paid to CEO</p></div>';
   h += '<div class="card"><h2>🧾 History</h2>';
   if (driverTx.length) {
@@ -666,7 +818,7 @@ function renderDriver() {
 
 // ========== CEO ==========
 function renderCEOLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goSettings()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button class="theme-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 12px;border-radius:10px;font-size:1.2rem;cursor:pointer" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="ceoPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'ceoPassInput\')">👁️</button></div><button class="btn" onclick="checkCEOPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -677,7 +829,7 @@ function checkCEOPass() {
   } else { alert("Wrong password"); }
 }
 function renderCEO() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goSettings()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button class="theme-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 12px;border-radius:10px;font-size:1.2rem;cursor:pointer" onclick="toggleTheme()">🌓</button></div>';
   h += '<div id="ceoContent"></div>';
   h += '<div class="bottom-nav">';
   h += '<button id="bn-dash" class="active" onclick="switchCEOTab(\'dash\')">📊<span>Dashboard</span></button>';
@@ -788,6 +940,7 @@ function toggleLoanDropdown() {
   var t = document.getElementById("txType").value;
   document.getElementById("loanDropdown").style.display = t==="repay" ? "block" : "none";
 }
+
 // ========== ADD TRANSACTIONS ==========
 function addTx() {
   var ty = document.getElementById("txType").value;
@@ -1048,17 +1201,10 @@ function togglePassword(id) {
   var el = document.getElementById(id);
   if (el) el.type = el.type==="password" ? "text" : "password";
 }
-function goHome() {
-  currentRole = null;
-  authenticated = false;
-  page = "home";
-  renderHome();
-}
 
 // ========== STARTUP ==========
 if (localStorage.getItem("theme") === "light") document.body.classList.remove("dark");
 
-// Hide splash after 2 seconds
 setTimeout(function(){
   var splash = document.getElementById("splash");
   if (splash) splash.classList.add("hidden");
