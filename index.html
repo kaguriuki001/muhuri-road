@@ -40,6 +40,7 @@
       line-height: 1.5;
       min-height: 100vh;
       -webkit-tap-highlight-color: transparent;
+      transition: background 0.3s, color 0.3s;
     }
     .app {
       max-width: 480px;
@@ -50,6 +51,28 @@
     }
     @media (min-width: 768px) { .app { max-width: 700px; } }
     @media (min-width: 1200px) { .app { max-width: 900px; } }
+
+    /* SPLASH SCREEN */
+    #splash {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, #ff6b00, #ff8c33);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: opacity 0.6s ease, visibility 0.6s;
+    }
+    #splash.hidden { opacity: 0; visibility: hidden; }
+    #splash .splash-logo { font-size: 6rem; margin-bottom: 20px; animation: pulse 1.5s ease-in-out infinite; }
+    #splash .splash-logo-img { max-width: 140px; max-height: 140px; margin-bottom: 20px; border-radius: 24px; animation: pulse 1.5s ease-in-out infinite; }
+    #splash h1 { font-size: 2rem; font-weight: 800; letter-spacing: 1px; }
+    #splash p { font-size: 0.9rem; opacity: 0.9; margin-top: 8px; letter-spacing: 1px; }
+    #splash .loader { margin-top: 40px; width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .header {
       display: flex;
@@ -78,6 +101,16 @@
       display: flex;
       align-items: center;
       gap: 4px;
+      backdrop-filter: blur(10px);
+    }
+    .theme-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
       backdrop-filter: blur(10px);
     }
 
@@ -115,6 +148,29 @@
     .btn.secondary { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); box-shadow: none; }
     .btn.green { background: var(--green); color: #000; box-shadow: 0 4px 12px rgba(48,209,88,0.25); }
 
+    /* TRUST BADGES */
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 16px;
+      margin: 10px 0 20px;
+    }
+    .trust-badge {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: var(--shadow);
+    }
+
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
     .stat {
       background: var(--surface);
@@ -143,6 +199,16 @@
     .done { text-decoration: line-through; opacity: 0.5; }
     .inflow { color: var(--green); font-weight: 600; }
     .outflow { color: var(--red); font-weight: 600; }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text2);
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 10px; opacity: 0.8; }
+    .empty-state .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .empty-state .empty-text { font-size: 0.9rem; line-height: 1.5; }
 
     .bottom-nav {
       position: fixed;
@@ -196,10 +262,7 @@
     }
     .modal {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7);
       z-index: 200;
       display: flex;
@@ -235,6 +298,15 @@
   </style>
 </head>
 <body class="dark" id="body">
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div id="splashLogo">🛺</div>
+  <h1>MUHURI ROAD</h1>
+  <p>Tuko Njiani, Uko Safe</p>
+  <div class="loader"></div>
+</div>
+
 <div class="app" id="appContent">Loading...</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -271,6 +343,7 @@ var GROUP = "#";
 var ceoPass = "1234";
 var driverPass = "0000";
 var debts = {dad:145000, equity:60000, caritas:10000, frpeter:15000};
+var gpsWatchId = null;
 
 function saveAll() {
   localStorage.setItem("tx", JSON.stringify(tx));
@@ -286,27 +359,14 @@ function saveAll() {
   localStorage.setItem("driverPass", driverPass);
   localStorage.setItem("debts", JSON.stringify(debts));
 
-  db.collection("appData").doc("main").set({
-    tx: tx, tasks: tasks, ride: ride, docs: docs, plans: plans,
-    bg: bg, logo: logo, WA: WA, GROUP: GROUP,
-    ceoPass: ceoPass, driverPass: driverPass, debts: debts,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(function(err) { console.error("Sync error", err); });
-}
-
-function saveLocalFromCloud() {
-  localStorage.setItem("tx", JSON.stringify(tx));
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  localStorage.setItem("ride", JSON.stringify(ride));
-  localStorage.setItem("documents", JSON.stringify(docs));
-  localStorage.setItem("plans", JSON.stringify(plans));
-  localStorage.setItem("bg", bg);
-  localStorage.setItem("logo", logo);
-  localStorage.setItem("wa", WA);
-  localStorage.setItem("group", GROUP);
-  localStorage.setItem("ceoPass", ceoPass);
-  localStorage.setItem("driverPass", driverPass);
-  localStorage.setItem("debts", JSON.stringify(debts));
+  try {
+    db.collection("appData").doc("main").set({
+      tx: tx, tasks: tasks, ride: ride, docs: docs, plans: plans,
+      bg: bg, logo: logo, WA: WA, GROUP: GROUP,
+      ceoPass: ceoPass, driverPass: driverPass, debts: debts,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(err) { console.error("Sync error", err); });
+  } catch(e) { console.error("Firebase error", e); }
 }
 
 function autoInit() {
@@ -328,11 +388,10 @@ function autoInit() {
   capital.forEach(function(e){ e.date = new Date().toISOString(); tx.push(e); });
 }
 
-function loadCloud() {
-  // 1. Load local first
-  var localTx = JSON.parse(localStorage.getItem("tx") || "null");
-  if (localTx && localTx.length > 0) {
-    tx = localTx;
+function loadLocal() {
+  var localTx = localStorage.getItem("tx");
+  if (localTx) {
+    tx = JSON.parse(localTx);
     tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
     ride = JSON.parse(localStorage.getItem("ride") || '{"lat":-1.2759,"lng":36.69268,"avail":true}');
     docs = JSON.parse(localStorage.getItem("documents") || "[]");
@@ -344,38 +403,46 @@ function loadCloud() {
     ceoPass = localStorage.getItem("ceoPass") || "1234";
     driverPass = localStorage.getItem("driverPass") || "0000";
     debts = JSON.parse(localStorage.getItem("debts") || '{"dad":145000,"equity":60000,"caritas":10000,"frpeter":15000}');
+    return true;
   }
+  return false;
+}
 
-  // 2. Try cloud
+function loadCloud() {
+  var hasLocal = loadLocal();
+  if (!hasLocal) {
+    autoInit();
+    saveAll();
+  }
+  // Splash logo
+  var sl = document.getElementById("splashLogo");
+  if (logo) {
+    sl.outerHTML = '<img class="splash-logo-img" src="'+logo+'">';
+  }
+  renderApp();
+
   db.collection("appData").doc("main").get().then(function(doc) {
     if (doc.exists) {
       var d = doc.data();
-      if (d.tx) tx = d.tx;
-      if (d.tasks) tasks = d.tasks;
-      if (d.ride) ride = d.ride;
-      if (d.docs) docs = d.docs;
-      if (d.plans) plans = d.plans;
-      if (d.bg) bg = d.bg;
-      if (d.logo) logo = d.logo;
-      if (d.WA) WA = d.WA;
-      if (d.GROUP) GROUP = d.GROUP;
-      if (d.ceoPass) ceoPass = d.ceoPass;
-      if (d.driverPass) driverPass = d.driverPass;
-      if (d.debts) debts = d.debts;
-      saveLocalFromCloud();
-    } else {
-      if (tx.length === 0) {
-        autoInit();
+      if (d.tx && Array.isArray(d.tx) && d.tx.length > 0) {
+        tx = d.tx;
+        tasks = d.tasks || [];
+        ride = d.ride || {lat:-1.2759, lng:36.69268, avail:true};
+        docs = d.docs || [];
+        plans = d.plans || [];
+        bg = d.bg || "";
+        logo = d.logo || "";
+        WA = d.WA || "254795827853";
+        GROUP = d.GROUP || "#";
+        ceoPass = d.ceoPass || "1234";
+        driverPass = d.driverPass || "0000";
+        debts = d.debts || {dad:145000, equity:60000, caritas:10000, frpeter:15000};
         saveAll();
+        renderApp();
       }
     }
-    renderApp();
   }).catch(function(err) {
     console.error("Cloud load error", err);
-    if (tx.length === 0) {
-      autoInit();
-      saveAll();
-    }
     renderApp();
   });
 }
@@ -420,6 +487,17 @@ function getTotalMoneyOut() {
 function getBalance() {
   return getTotalMoneyIn() - getTotalMoneyOut();
 }
+function emptyState(icon, title, text) {
+  return '<div class="empty-state"><div class="empty-icon">'+icon+'</div><div class="empty-title">'+title+'</div><div class="empty-text">'+text+'</div></div>';
+}
+
+// ========== THEME TOGGLE ==========
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  var isDark = document.body.classList.contains("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+}
+if (localStorage.getItem("theme") === "light") document.body.classList.remove("dark");
 
 // ========== ROUTING ==========
 var params = new URLSearchParams(window.location.search);
@@ -441,10 +519,19 @@ function renderApp() {
 
 // ========== HOME ==========
 function renderHome() {
-  var h = '<div style="text-align:center;padding-top:40px">';
-  h += logo ? '<img src="'+logo+'" style="max-width:180px; max-height:120px; margin-bottom:15px; border-radius:20px;" alt="Logo">' : '<div style="font-size:5rem">🛺</div>';
+  var h = '<div style="text-align:center;padding-top:30px">';
+  h += logo ? '<img src="'+logo+'" style="max-width:160px; max-height:110px; margin-bottom:15px; border-radius:20px;" alt="Logo">' : '<div style="font-size:5rem">🛺</div>';
   h += '<h1 style="font-size:2rem;font-weight:800;margin:10px 0">Muhuri Road</h1>';
-  h += '<p style="color:var(--text2);margin-bottom:20px">Tuko Njiani, Uko Safe</p></div>';
+  h += '<p style="color:var(--text2);margin-bottom:20px;font-weight:500">Tuko Njiani, Uko Safe</p></div>';
+
+  // TRUST BADGES
+  h += '<div class="trust-badges">';
+  h += '<div class="trust-badge">✅ Verified Drivers</div>';
+  h += '<div class="trust-badge">🛡️ GPS Tracked</div>';
+  h += '<div class="trust-badge">⭐ 4.8 Rating</div>';
+  h += '<div class="trust-badge">📞 24/7 Support</div>';
+  h += '</div>';
+
   h += '<div style="display:flex;flex-wrap:wrap;justify-content:center;padding:0 8px">';
   h += '<div class="role-card" onclick="selectRole(\'rider\')"><div class="icon">👤</div><h2>Rider</h2><p>Book a ride</p></div>';
   h += '<div class="role-card" onclick="selectRole(\'driver\')"><div class="icon">🚖</div><h2>Driver</h2><p>View payments</p></div>';
@@ -468,11 +555,11 @@ function logoOrEmoji() {
 // ========== RIDER ==========
 var map, marker;
 function renderRide() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Muhuri Road</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card"><h2>📍 Live Location</h2><span class="status-badge online" id="rideBadge">🟢 Online</span><div id="rideMap" class="map-container"></div><p style="margin-top:8px;font-size:.8rem">Updated: <span id="rideUpdate">Never</span></p></div>';
   h += '<div class="card"><h2>📞 Book</h2><a class="btn" style="background:#25D366" id="waBook" href="#" target="_blank">💬 WhatsApp Booking</a><a class="btn secondary" id="waPriority" href="#" target="_blank">⭐ Priority (KSh 100/mo)</a></div>';
   h += '<div class="card"><h2>👥 Community</h2><a class="btn secondary" id="waGroup" href="#">💬 WhatsApp Group</a><a class="btn secondary" href="https://tiktok.com/@muhuriroad" target="_blank">🎵 TikTok</a><a class="btn secondary" href="https://instagram.com/muhuriroad" target="_blank">📸 Instagram</a></div>';
-  h += '<div class="card"><h2>🔧 Driver Panel</h2><label><input type="checkbox" id="availToggle" onchange="toggleAvail()"> <span id="availLabel">Offline</span></label><button class="btn" onclick="updateGPS()">📍 Update GPS</button><input type="text" id="manualCoords" placeholder="lat, lng"><button class="btn secondary" onclick="setManualLoc()">💾 Save</button></div>';
+  h += '<div class="card"><h2>🔧 Driver Panel</h2><label><input type="checkbox" id="availToggle" onchange="toggleAvail()"> <span id="availLabel">Offline</span></label><button class="btn" onclick="startGPS()">📍 Start Live GPS</button><button class="btn secondary" onclick="stopGPS()">⏹ Stop GPS</button><input type="text" id="manualCoords" placeholder="lat, lng"><button class="btn secondary" onclick="setManualLoc()">💾 Save Manual</button></div>';
   document.getElementById("appContent").innerHTML = h;
   setTimeout(initRideMap, 300);
   setTimeout(updateRideUI, 100);
@@ -485,17 +572,32 @@ function initRideMap() {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
   marker = L.marker([ride.lat, ride.lng]).addTo(map).bindPopup("Muhuri Road Tuktuk").openPopup();
 }
-function updateGPS() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(p) {
-      ride.lat = p.coords.latitude;
-      ride.lng = p.coords.longitude;
-      ride.lastUpdate = Date.now();
-      saveAll();
-      if (marker) { marker.setLatLng([ride.lat, ride.lng]); map.setView([ride.lat, ride.lng], 15); }
-      updateRideUI();
-    });
-  } else { alert("GPS not supported"); }
+
+// REAL-TIME GPS
+function startGPS() {
+  if (!navigator.geolocation) { alert("GPS not supported"); return; }
+  if (gpsWatchId !== null) { alert("GPS already running"); return; }
+  gpsWatchId = navigator.geolocation.watchPosition(function(p) {
+    ride.lat = p.coords.latitude;
+    ride.lng = p.coords.longitude;
+    ride.lastUpdate = Date.now();
+    saveAll();
+    if (marker && map) {
+      marker.setLatLng([ride.lat, ride.lng]);
+      map.setView([ride.lat, ride.lng], 15);
+    }
+    updateRideUI();
+  }, function(err) {
+    console.error("GPS error", err);
+  }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+  alert("✅ Live GPS started. Location updates every 30 seconds.");
+}
+function stopGPS() {
+  if (gpsWatchId !== null) {
+    navigator.geolocation.clearWatch(gpsWatchId);
+    gpsWatchId = null;
+    alert("⏹ GPS stopped.");
+  }
 }
 function setManualLoc() {
   var parts = document.getElementById("manualCoords").value.split(",");
@@ -533,10 +635,9 @@ function updateRideUI() {
   var lab = document.getElementById("availLabel");
   if (lab) lab.textContent = ride.avail ? "🟢 Available" : "🔴 Offline";
 }
-
 // ========== DRIVER ==========
 function renderDriverLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver Login</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="driverPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'driverPassInput\')">👁️</button></div><button class="btn" onclick="checkDriverPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -549,21 +650,23 @@ function checkDriverPass() {
 function renderDriver() {
   var driverTx = tx.filter(function(t){return t.type==="lease"});
   var total = driverTx.reduce(function(s,t){return s+t.amount},0);
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>Driver</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card"><h2>💰 Lease Payments</h2><p style="font-size:1.8rem;font-weight:700;color:var(--primary)">' + total.toLocaleString() + ' KSh</p><p style="color:var(--text2)">Total paid to CEO</p></div>';
-  h += '<div class="card"><h2>🧾 History</h2><div style="max-height:300px;overflow:auto">';
+  h += '<div class="card"><h2>🧾 History</h2>';
   if (driverTx.length) {
+    h += '<div style="max-height:300px;overflow:auto">';
     h += driverTx.map(function(t){return '<div class="list-item"><span>' + t.type.toUpperCase() + ' ' + (t.note||"") + '</span><span class="inflow">+' + t.amount.toLocaleString() + '</span></div>';}).join("");
+    h += '</div>';
   } else {
-    h += "<p>🔨 No payments yet.</p>";
+    h += emptyState("💰","No payments yet","Your lease payments will appear here. Keep going — every shilling counts.");
   }
-  h += '</div></div>';
+  h += '</div>';
   document.getElementById("appContent").innerHTML = h;
 }
 
 // ========== CEO ==========
 function renderCEOLock() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO Login</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
   h += '<div class="card" style="margin-top:40px;text-align:center"><h2>🔐 Enter Password</h2><div class="pw-toggle"><input type="password" id="ceoPassInput" placeholder="Password" style="text-align:center;font-size:2rem"><button class="eye" onclick="togglePassword(\'ceoPassInput\')">👁️</button></div><button class="btn" onclick="checkCEOPass()">Unlock</button></div>';
   document.getElementById("appContent").innerHTML = h;
 }
@@ -574,7 +677,7 @@ function checkCEOPass() {
   } else { alert("Wrong password"); }
 }
 function renderCEO() {
-  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button onclick="goHome()" style="background:rgba(255,255,255,0.2);border:none;font-size:1.5rem;border-radius:10px;padding:4px 10px;color:#fff;">🏠</button></div>';
+  var h = '<div class="header"><button class="back-btn" onclick="goHome()">← Back</button>'+logoOrEmoji()+'<h1>CEO</h1><button class="theme-btn" onclick="toggleTheme()">🌓</button></div>';
   h += '<div id="ceoContent"></div>';
   h += '<div class="bottom-nav">';
   h += '<button id="bn-dash" class="active" onclick="switchCEOTab(\'dash\')">📊<span>Dashboard</span></button>';
@@ -619,10 +722,14 @@ function switchCEOTab(tab) {
     content += '<div class="card"><h2>🧾 Recent</h2><div id="recentTx"></div></div>';
     setTimeout(function(){
       var recent = tx.slice().reverse().slice(0,10);
-      document.getElementById("recentTx").innerHTML = recent.length ? recent.map(function(t){
-        var s = ["lease","topup","advert","capital"].includes(t.type) ? "+" : "-";
-        return '<div class="list-item"><span>' + t.type.toUpperCase() + ' ' + (t.note||"") + '</span><span class="' + (s==="+"?"inflow":"outflow") + '">' + s + ' KSh ' + t.amount.toLocaleString() + '</span></div>';
-      }).join("") : '🔨 No transactions yet.';
+      if (recent.length) {
+        document.getElementById("recentTx").innerHTML = recent.map(function(t){
+          var s = ["lease","topup","advert","capital"].includes(t.type) ? "+" : "-";
+          return '<div class="list-item"><span>' + t.type.toUpperCase() + ' ' + (t.note||"") + '</span><span class="' + (s==="+"?"inflow":"outflow") + '">' + s + ' KSh ' + t.amount.toLocaleString() + '</span></div>';
+        }).join("");
+      } else {
+        document.getElementById("recentTx").innerHTML = emptyState("🛺","Fresh start","Your first transaction will appear here. Add a lease, expense, or capital.");
+      }
     },100);
   }
   else if (tab==="tasks") {
@@ -649,13 +756,15 @@ function switchCEOTab(tab) {
     content += '<div class="stat"><div class="label">Net Cash</div><div class="value">' + (inc - rep - exp).toLocaleString() + '</div></div>';
     content += '</div>';
     content += '<button class="btn green" onclick="downloadExcel()">📥 Download Excel</button>';
-    content += '<div class="card"><h2>🧾 All Expenses</h2><div style="max-height:300px;overflow:auto">';
+    content += '<div class="card"><h2>🧾 All Expenses</h2>';
     var expenses = tx.filter(function(t){return t.type==="expense"}).reverse();
     if (expenses.length) {
+      content += '<div style="max-height:300px;overflow:auto">';
       expenses.forEach(function(t){
         content += '<div class="list-item"><span>' + t.note + '</span><span class="outflow">- ' + t.amount.toLocaleString() + '</span></div>';
       });
-    } else { content += '<p>🔨 No expenses yet.</p>'; }
+      content += '</div>';
+    } else { content += emptyState("📊","No expenses yet","When you record an expense, it will appear here with a clear breakdown."); }
     content += '</div></div>';
   }
   else if (tab==="documents") {
@@ -679,7 +788,6 @@ function toggleLoanDropdown() {
   var t = document.getElementById("txType").value;
   document.getElementById("loanDropdown").style.display = t==="repay" ? "block" : "none";
 }
-
 // ========== ADD TRANSACTIONS ==========
 function addTx() {
   var ty = document.getElementById("txType").value;
@@ -773,7 +881,7 @@ function renderPlans() {
   if (!l) return;
   l.innerHTML = plans.length ? plans.map(function(p){
     return '<div class="list-item"><span><strong>'+p.title+'</strong> ('+p.type+')</span><button onclick="deletePlan('+p.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
-  }).join("") : '🔨 No plans saved.';
+  }).join("") : emptyState("📅","No plans yet","Set a daily, weekly, or monthly goal. Plans keep you sharp.");
 }
 
 // ========== TASKS ==========
@@ -797,9 +905,13 @@ function delTask(id) {
 function renderTasks() {
   var list = document.getElementById("taskList");
   if (!list) return;
-  list.innerHTML = tasks.length ? tasks.map(function(x){
-    return '<div class="list-item"><span class="'+(x.done?"done":"")+'">'+x.text+'</span><button onclick="toggleTask('+x.id+')" style="background:var(--primary);color:#fff;border:none;padding:4px 8px;border-radius:6px;">'+(x.done?"↩️":"✅")+'</button><button onclick="delTask('+x.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
-  }).join("") : '🔨 No tasks yet.';
+  if (tasks.length) {
+    list.innerHTML = tasks.map(function(x){
+      return '<div class="list-item"><span class="'+(x.done?"done":"")+'">'+x.text+'</span><button onclick="toggleTask('+x.id+')" style="background:var(--primary);color:#fff;border:none;padding:4px 8px;border-radius:6px;">'+(x.done?"↩️":"✅")+'</button><button onclick="delTask('+x.id+')" style="background:var(--red);color:#fff;border:none;padding:4px 8px;border-radius:6px;">🗑️</button></div>';
+    }).join("");
+  } else {
+    list.innerHTML = emptyState("✅","Nothing on the list","Add your first task. Small steps move mountains.");
+  }
 }
 
 // ========== DOCUMENTS ==========
@@ -825,7 +937,7 @@ function deleteDocument(id) {
 function renderDocuments() {
   var list = document.getElementById("documentList");
   if (!list) return;
-  if (docs.length===0) { list.innerHTML = "<p>🔨 No documents saved.</p>"; return; }
+  if (docs.length===0) { list.innerHTML = emptyState("📄","No documents yet","Save important notes, contracts, or plans. They stay on your device and cloud."); return; }
   var html = "";
   for (var i=0; i<docs.length; i++) {
     var d = docs[i];
@@ -944,8 +1056,16 @@ function goHome() {
 }
 
 // ========== STARTUP ==========
-if (localStorage.getItem("theme")==="light") document.body.classList.add("light");
+if (localStorage.getItem("theme") === "light") document.body.classList.remove("dark");
+
+// Hide splash after 2 seconds
+setTimeout(function(){
+  var splash = document.getElementById("splash");
+  if (splash) splash.classList.add("hidden");
+}, 2000);
+
 loadCloud();
+
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 </script>
 </body>
